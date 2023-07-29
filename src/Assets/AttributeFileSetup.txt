@@ -1,0 +1,16 @@
+to indicate which attributes the file contains(must contain vertices and indices): a
+            codes:
+                0: stroke width
+                1: bullet spawns
+
+to indicate the start of vertices: v
+to indicate the start of indices: i
+to indicate the start of stroke width: s (this is just 1 float, defaults to 5)
+to indicate the bullet spawn vertices: b (even number of floats)
+
+to end a block: e
+
+do not have a comma after the last number in a list 
+
+
+unfortunately comments are not yet supported, will get around to it eventually
