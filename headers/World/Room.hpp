@@ -3,6 +3,7 @@
 #include "World/Tile.hpp"
 #include "Shaders/Shader.hpp"
 #include "Rand.hpp"
+#include "Entity/Hitbox.hpp"
 
 class Room {
     int width;
@@ -14,6 +15,7 @@ class Room {
     int design = 0; // for now there will only be one design (design 0)
 
     Tile** tilesPtr;
+    Hitbox** hitboxesPtr;
 
     Shader shader;
 
@@ -36,6 +38,8 @@ class Room {
 
         void activateShader();
         void draw(float x, float y);
+
+        void getHitboxes(Hitbox***, int*, int*);
 
         void close();
 };

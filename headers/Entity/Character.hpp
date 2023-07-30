@@ -6,9 +6,12 @@
 
 #include <limits>
 
-#include "Shaders/Shader.hpp"
-#include "Entity/Bullet.hpp"
 #include "AttributesParser.hpp"
+
+#include "Shaders/Shader.hpp"
+
+#include "Entity/Hitbox.hpp"
+#include "Entity/Bullet.hpp"
 
 /* Error Codes
     0: fine
@@ -20,14 +23,18 @@
 class Character {
     int error = 0;
 
+    float xPos = 400.0f;
+    float yPos = 300.0f;
+
     float width = 0.0f;
 
     AttributesParser attributesParser;
 
     Shader shader;
 
-    Bullet bullets[100];
+    Hitbox hitbox;
 
+    Bullet bullets[100];
 
     public: 
         Character();
