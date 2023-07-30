@@ -13,6 +13,10 @@ void Character::setup(const char* characterFile, const char* vertexShaderFile, c
 
     attributesParser.readFile(characterFile);
 
+    hitbox.setCoords(xPos + 4.0f, yPos + 4.0f); // a buffer of 4 pixels on each side
+    hitbox.setDimensions(width - 8.0f, width - 8.0f);
+    hitbox.setInteractiveProperties(0, 0);
+
     shader.setup(vertexShaderFile, fragmentShaderFile, attributesParser.verticesPtr, attributesParser.verticesLen, attributesParser.indicesPtr, attributesParser.indicesLen);
 }
 
@@ -45,7 +49,7 @@ void Character::draw() {
 
     shader.set2f("resize", width/2.0f, -width/2.0f);
     shader.set2f("screenDimensions", 800, 600);
-    shader.set2f("coords", 400.0f, 300.0f);
+    shader.set2f("coords", xPos, yPos);
 
     shader.draw();
 }

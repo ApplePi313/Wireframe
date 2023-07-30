@@ -19,6 +19,9 @@ int windowHeight = 600;
 float xPos = 0;
 float yPos = 0;
 
+float xChange = 0.0f;
+float yChange = 0.0f;
+
 float speed = 30;
 
 Character character;
@@ -27,6 +30,8 @@ Room room;
 
 void framebuffer_size_callback(GLFWwindow*, int, int);
 void processInput(GLFWwindow*);
+
+void checkHitboxInteractions();
 
 int main(void) {
 
@@ -130,23 +135,35 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 }
 
 void processInput(GLFWwindow* window) {
+    xChange = 0.0f;
+    yChange = 0.0f;
+
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
     }
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        yPos += speed;
+        yChange += speed;
     }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        xPos += speed;
+        xChange += speed;
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        yPos -= speed;
+        yChange -= speed;
     }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        xPos -= speed;
+        xChange -= speed;
     }
+
+    checkHitboxInteractions();
+
+    xPos += xChange;
+    yPos += yChange;
 
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
         character.shoot(0);
     }
+}
+
+void checkHitboxInteractions() {
+
 }

@@ -19,15 +19,18 @@ void Room::setup(int roomWidth, int roomHeight, int roomDesign, const char* vert
 
     shader.fileSetup(vertexShaderFile, fragmentShaderFile);
 
-    tilesPtr = new Tile*[width];
+    tilesPtr = new Tile*[height];
+    hitboxesPtr = new Hitbox*[height];
 
     for (int i = 0; i < height; i++) {
         *(tilesPtr + i) = new Tile[height];
+        *(hitboxesPtr + i) = new Hitbox[height];
     }
 
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
-            *(*(tilesPtr + j) + i) = Tile(64, &shader);
+            *(*(tilesPtr + i) + j) = Tile(64, &shader);
+            *(*(hitboxesPtr + i) + j) = Hitbox(0.0f, 0.0f, 64.0f, 64.0f, 0);
         }
     }
 
@@ -72,6 +75,7 @@ void Room::generate() {
 
     for (int i = 0; i < numBoxes; i++) {
         (*(*(tilesPtr + *(boxesYPtr + i)) + *(boxesXPtr + i))).setDesign(1, &shader);
+        (*(*(hitboxesPtr + *(boxesYPtr + i)) + *(boxesXPtr + i))).setType(1);
     }
 
     return;
@@ -89,23 +93,29 @@ void Room::draw(float x, float y) {
 
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
-            if ((*(*(tilesPtr + j) + i)).getLayer() == 0) (*(*(tilesPtr + j) + i)).draw(64 * j + x, 64 * i + y, &shader);
+            if ((*(*(tilesPtr + i) + j)).getLayer() == 0) (*(*(tilesPtr + i) + j)).draw(64 * j + x, 64 * i + y, &shader);
         }
     }
 
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
-            if ((*(*(tilesPtr + j) + i)).getLayer() == 1) (*(*(tilesPtr + j) + i)).draw(64 * j + x, 64 * i + y, &shader);
+            if ((*(*(tilesPtr + i) + j)).getLayer() == 1) (*(*(tilesPtr + i) + j)).draw(64 * j + x, 64 * i + y, &shader);
         }
     }
+}
+
+void Room::getHitboxes(Hitbox*** outHitboxesPtr, int* outWidth, int* outHeight) {
+
 }
 
 void Room::close() {
     for (int i = 0; i < height; i++) {
         delete[] *(tilesPtr + i);
+        delete[] *(hitboxesPtr + i);
     }
 
     delete[] tilesPtr;
+    delete[] hitboxesPtr;
 
     return;
 }
