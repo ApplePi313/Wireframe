@@ -10,6 +10,7 @@
     Designs:
     0: floor
     1: box
+    2: wall
 */
 
 /* Error Codes
@@ -18,6 +19,9 @@
 */
 
 class Tile {
+    float xPos = 0.0f;
+    float yPos = 0.0f;
+
     int size = 64; // Tile size in pixels
 
     int design = 0;
@@ -30,7 +34,7 @@ class Tile {
 
         Tile();
 
-        Tile(int, Shader*);
+        Tile(float, float, int, Shader*);
 
         void setDesign(int, Shader*);
 

@@ -53,4 +53,5 @@ class Hitbox {
         void setInteractiveProperties(int, int);
 
         bool isColliding(Hitbox);
+        bool isBlocking();
 };

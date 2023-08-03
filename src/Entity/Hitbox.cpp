@@ -58,19 +58,27 @@ void Hitbox::setInteractiveProperties(int hitboxType, int hitboxModifier) {type 
 bool Hitbox::isColliding(Hitbox otherHitbox) {
     if (xPos < otherHitbox.getX()) {
         if (yPos < otherHitbox.getY()) {
-            return (otherHitbox.getX() - xPos < width && otherHitbox.getY() - yPos < height); // other hitbox is to bottom right
+            return (otherHitbox.getX() - xPos <= width && otherHitbox.getY() - yPos <= height); // other hitbox is to bottom right
 
         } else {
-            return (otherHitbox.getX() - xPos < width && yPos - otherHitbox.getY() < otherHitbox.getHeight()); // other hitbox is to top right
+            return (otherHitbox.getX() - xPos <= width && yPos - otherHitbox.getY() <= otherHitbox.getHeight()); // other hitbox is to top right
 
         }
     } else {
         if (yPos < otherHitbox.getY()) {
-            return (xPos - otherHitbox.getX() < otherHitbox.getWidth() && otherHitbox.getY() - yPos < height); // other hitbox is to bottom left
+            return (xPos - otherHitbox.getX() <= otherHitbox.getWidth() && otherHitbox.getY() - yPos <= height); // other hitbox is to bottom left
 
         } else {
-            return (xPos - otherHitbox.getX() < otherHitbox.getWidth() && yPos - otherHitbox.getY() < otherHitbox.getHeight()); // other hitbox is to top left
+            return (xPos - otherHitbox.getX() <= otherHitbox.getWidth() && yPos - otherHitbox.getY() <= otherHitbox.getHeight()); // other hitbox is to top left
 
         }
     }
+}
+
+bool Hitbox::isBlocking() {
+    if (type == 1 || type == 3) {
+        std::cout << width << " " << height << std::endl;
+        std::cout << xPos << " " << yPos << std::endl;
+    }
+    return (type == 1 || type == 3);
 }

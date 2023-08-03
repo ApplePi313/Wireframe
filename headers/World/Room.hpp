@@ -6,6 +6,8 @@
 #include "Entity/Hitbox.hpp"
 
 class Room {
+    float xPos = 0.0f;
+    float yPos = 0.0f;
     int width;
     int height;
 
@@ -32,9 +34,9 @@ class Room {
 
     public:
         Room();
-        Room(int, int, int, const char*, const char*);
+        Room(float, float, int, int, int, const char*, const char*);
 
-        void setup(int, int, int, const char*, const char*);
+        void setup(float, float, int, int, int, const char*, const char*);
 
         void activateShader();
         void draw(float x, float y);

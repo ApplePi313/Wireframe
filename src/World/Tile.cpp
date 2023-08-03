@@ -2,7 +2,10 @@
 
 Tile::Tile() {}
 
-Tile::Tile(int tileSize, Shader* shader) {
+Tile::Tile(float x, float y, int tileSize, Shader* shader) {
+    xPos = x;
+    yPos = y;
+
     size = tileSize;
 
     setDesign(0, shader);
@@ -22,6 +25,10 @@ void Tile::setDesign(int tileDesign, Shader* shader) {
 
             break;
         case 1:
+            layer = 2;
+
+            break;
+        case 2:
             layer = 1;
 
             break;
@@ -35,7 +42,8 @@ void Tile::draw(float x, float y, Shader* shader) {
 
     // std::cout << design << std::endl;
 
-    (*shader).set2f("coords", x, y);
+    // (*shader).set2f("worldCoords", x, y);
+    (*shader).set2f("coords", xPos, yPos);
 
     (*shader).draw();
 }

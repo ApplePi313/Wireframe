@@ -2,19 +2,22 @@
 
 Character::Character() {}
 
-Character::Character(const char* characterFile, const char* vertexShaderFile, const char* fragmentShaderFile, float characterWidth) {
-    setup(characterFile, vertexShaderFile, fragmentShaderFile, characterWidth);
+Character::Character(const char* characterFile, const char* vertexShaderFile, const char* fragmentShaderFile, float characterWidth, float x, float y) {
+    setup(characterFile, vertexShaderFile, fragmentShaderFile, characterWidth, x, y);
 }
 
-void Character::setup(const char* characterFile, const char* vertexShaderFile, const char* fragmentShaderFile, float characterWidth) {
+void Character::setup(const char* characterFile, const char* vertexShaderFile, const char* fragmentShaderFile, float characterWidth, float x, float y) {
     error = 0;
+
+    xPos = x;
+    yPos = y;
 
     width = characterWidth;
 
     attributesParser.readFile(characterFile);
 
-    hitbox.setCoords(xPos + 4.0f, yPos + 4.0f); // a buffer of 4 pixels on each side
-    hitbox.setDimensions(width - 8.0f, width - 8.0f);
+    hitbox.setCoords(xPos, yPos);
+    hitbox.setDimensions(width, width);
     hitbox.setInteractiveProperties(0, 0);
 
     shader.setup(vertexShaderFile, fragmentShaderFile, attributesParser.verticesPtr, attributesParser.verticesLen, attributesParser.indicesPtr, attributesParser.indicesLen);
@@ -42,13 +45,15 @@ void Character::activateShader() {
     shader.activate();
 }
     
-void Character::draw() {
+void Character::draw(float windowWidth, float windowHeight, float x, float y) {
     activateShader();
 
     glLineWidth(attributesParser.strokeWidth);
 
     shader.set2f("resize", width/2.0f, -width/2.0f);
-    shader.set2f("screenDimensions", 800, 600);
+    shader.set2f("dimensions", width, width);
+    shader.set2f("screenDimensions", windowWidth, windowHeight);
+    shader.set2f("worldCoords", x, y);
     shader.set2f("coords", xPos, yPos);
 
     shader.draw();
@@ -58,6 +63,24 @@ void Character::shoot(int position) {
     if (position < 0 || position >= attributesParser.numBulletSpawns) {
         return;
     }
+}
+
+void Character::setCoords(float x, float y) {
+    xPos = x;
+    yPos = y;
+
+    hitbox.setCoords(xPos, yPos);
+}
+
+void Character::translate(float x, float y) {
+    xPos += x;
+    yPos += y;
+
+    hitbox.setCoords(xPos, yPos);
+}
+
+Hitbox Character::getHitbox() {
+    return hitbox;
 }
 
 void Character::set1f(const char* var, float arg1) {

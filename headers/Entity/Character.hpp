@@ -23,8 +23,8 @@
 class Character {
     int error = 0;
 
-    float xPos = 400.0f;
-    float yPos = 300.0f;
+    float xPos = 0.0f;
+    float yPos = 0.0f;
 
     float width = 0.0f;
 
@@ -38,9 +38,9 @@ class Character {
 
     public: 
         Character();
-        Character(const char*, const char*, const char*, float);
-
-        void setup(const char*, const char*, const char*, float);
+        Character(const char*, const char*, const char*, float, float, float);
+            // character attribute file,  vshader, fshader, character size, xPos, yPos
+        void setup(const char*, const char*, const char*, float, float, float);
 
         void getVertices(float**, int*);
         void getIndices(unsigned int**, int*);
@@ -52,7 +52,12 @@ class Character {
         // These all just call programs in the Shader class
         void activateShader();
         
-        void draw();
+        void draw(float, float, float, float);
+
+        void setCoords(float, float);
+        void translate(float, float);
+
+        Hitbox getHitbox();
 
         void set1f(const char*, float);
         void set2f(const char*, float, float);

@@ -4,11 +4,14 @@
 
 Room::Room() {}
 
-Room::Room(int roomWidth, int roomHeight, int roomDesign, const char* vertexShaderFile, const char* fragmentShaderFile) {
-    setup(roomWidth, roomHeight, roomDesign, vertexShaderFile, fragmentShaderFile);
+Room::Room(float x, float y, int roomWidth, int roomHeight, int roomDesign, const char* vertexShaderFile, const char* fragmentShaderFile) {
+    setup(x, y, roomWidth, roomHeight, roomDesign, vertexShaderFile, fragmentShaderFile);
 }
 
-void Room::setup(int roomWidth, int roomHeight, int roomDesign, const char* vertexShaderFile, const char* fragmentShaderFile) {
+void Room::setup(float x, float y, int roomWidth, int roomHeight, int roomDesign, const char* vertexShaderFile, const char* fragmentShaderFile) {
+    xPos = x;
+    yPos = y;
+
     width = roomWidth;
     height = roomHeight;
 
@@ -29,9 +32,24 @@ void Room::setup(int roomWidth, int roomHeight, int roomDesign, const char* vert
 
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
-            *(*(tilesPtr + i) + j) = Tile(64, &shader);
-            *(*(hitboxesPtr + i) + j) = Hitbox(0.0f, 0.0f, 64.0f, 64.0f, 0);
+            *(*(tilesPtr + i) + j) = Tile(xPos + j * 64.0f, yPos + i * 64.0f, 64, &shader);
+            *(*(hitboxesPtr + i) + j) = Hitbox(xPos + j * 64.0f, yPos + i * 64.0f, 64.0f, 64.0f, 0);
         }
+    }
+
+    for (int i = 0; i < width; i++) { // set the side walls of the room
+        (*(*(tilesPtr + 0) + i)).setDesign(2, &shader);
+        (*(*(hitboxesPtr + 0) + i)).setType(1);
+
+        (*(*(tilesPtr + height - 1) + i)).setDesign(2, &shader);
+        (*(*(hitboxesPtr + height - 1) + i)).setType(1);
+    }
+    for (int i = 0; i < height - 2; i++) {
+        (*(*(tilesPtr + i + 1) + 0)).setDesign(2, &shader);
+        (*(*(hitboxesPtr + i + 1) + 0)).setType(1);
+
+        (*(*(tilesPtr + i + 1) + width - 1)).setDesign(2, &shader);
+        (*(*(hitboxesPtr + i + 1) + width - 1)).setType(1);
     }
 
     generate();
@@ -53,8 +71,8 @@ void Room::generate() {
 
     do {
         for (int i = 0; i < numBoxes; i++) {
-            *(boxesXPtr + i) = randGen.getPositiveInt() % usableWidth;
-            *(boxesYPtr + i) = randGen.getPositiveInt() % usableHeight;
+            *(boxesXPtr + i) = randGen.getPositiveInt() % usableWidth + 1;
+            *(boxesYPtr + i) = randGen.getPositiveInt() % usableHeight + 1;
         }
 
         boxesAreSeparate = true;
@@ -88,24 +106,25 @@ void Room::activateShader() {
 void Room::draw(float x, float y) {
     activateShader();
 
+    shader.set2f("dimensions", 64.0f, 64.0f);
     shader.set2f("resize", 32, -32);
     shader.set2f("screenDimensions", 800, 600);
 
-    for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
-            if ((*(*(tilesPtr + i) + j)).getLayer() == 0) (*(*(tilesPtr + i) + j)).draw(64 * j + x, 64 * i + y, &shader);
-        }
-    }
+    shader.set2f("worldCoords", x, y);
 
-    for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
-            if ((*(*(tilesPtr + i) + j)).getLayer() == 1) (*(*(tilesPtr + i) + j)).draw(64 * j + x, 64 * i + y, &shader);
+    for (int layer = 0; layer < 10; layer++) {
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                if ((*(*(tilesPtr + i) + j)).getLayer() == layer) (*(*(tilesPtr + i) + j)).draw(x, y, &shader);
+            }
         }
     }
 }
 
 void Room::getHitboxes(Hitbox*** outHitboxesPtr, int* outWidth, int* outHeight) {
-
+    *outHitboxesPtr = hitboxesPtr;
+    *outWidth = width;
+    *outHeight = height;
 }
 
 void Room::close() {

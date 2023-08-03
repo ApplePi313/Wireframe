@@ -4,6 +4,8 @@
 #include <GLFW/glfw3.h>
 
 #include "Entity/Character.hpp"
+#include "Entity/Hitbox.hpp"
+
 #include "World/Room.hpp"
 
 /*
@@ -22,16 +24,19 @@ float yPos = 0;
 float xChange = 0.0f;
 float yChange = 0.0f;
 
-float speed = 30;
+float speed = 1;
 
 Character character;
 
 Room room;
+Hitbox** roomHitboxesPtr;
+int roomWidth = 10;
+int roomHeight = 10;
 
 void framebuffer_size_callback(GLFWwindow*, int, int);
 void processInput(GLFWwindow*);
 
-void checkHitboxInteractions();
+void checkHitboxInteractions(float, float);
 
 int main(void) {
 
@@ -88,8 +93,8 @@ int main(void) {
     glLineWidth(4.0f); // Set the stroke size (max of 10)
 
 
-    character.setup("src/Assets/Characters/Player.attr", "src/Shaders/VertexShader.vert", "src/Shaders/FragmentShader.frag", 32.0f);
-    room.setup(10, 10, 0, "src/Shaders/VertexShader.vert", "src/Shaders/FragmentShader.frag");
+    character.setup("src/Assets/Characters/Player.attr", "src/Shaders/VertexShader.vert", "src/Shaders/FragmentShader.frag", 32.0f, windowWidth/2.0f - 16 + xPos, windowHeight/2.0f - 16 + yPos);
+    room.setup(0.0f, 0.0f, roomWidth, roomHeight, 0, "src/Shaders/VertexShader.vert", "src/Shaders/FragmentShader.frag");
 
             /*
             
@@ -99,10 +104,12 @@ int main(void) {
 
     while(!glfwWindowShouldClose(window)) {
         // check inputs
-        processInput(window);
+        for (int i = 0; i < 10; i++) {
+            processInput(window);
+        }
 
         // clear the screen
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // currently clears to be black
+        glClearColor(0.2f, 0.2f, 0.2f, 1.0f); // currently clears to be black
         glClear(GL_COLOR_BUFFER_BIT);
 
 
@@ -114,7 +121,7 @@ int main(void) {
 
         room.draw(xPos, yPos);
 
-        character.draw();
+        character.draw(windowWidth, windowHeight, xPos, yPos);
 
 
         // update the screen
@@ -142,28 +149,76 @@ void processInput(GLFWwindow* window) {
         glfwSetWindowShouldClose(window, true);
     }
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        yChange += speed;
-    }
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        xChange += speed;
-    }
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
         yChange -= speed;
     }
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
         xChange -= speed;
     }
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+        yChange += speed;
+    }
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+        xChange += speed;
+    }
 
-    checkHitboxInteractions();
-
-    xPos += xChange;
-    yPos += yChange;
+    checkHitboxInteractions(xChange, yChange);
 
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
         character.shoot(0);
     }
 }
 
-void checkHitboxInteractions() {
+void checkHitboxInteractions(float x, float y) {
+    room.getHitboxes(&roomHitboxesPtr, &roomWidth, &roomHeight);
 
+    xPos += x;
+
+    character.translate(x, 0);
+
+    bool alreadyMovedBack = false;
+
+    for (int i = 0; i < roomHeight; i++) {
+        for (int j = 0; j < roomWidth; j++) {
+            if (character.getHitbox().isColliding(*(*(roomHitboxesPtr + i) + j))) {
+                if ((*(*(roomHitboxesPtr + i) + j)).isBlocking() && !alreadyMovedBack) {
+                    xPos -= x;
+                    character.translate(-x, 0);
+
+                    std::cout << "a" << std::endl;
+
+                    Hitbox tmp = character.getHitbox();
+
+                    std::cout << tmp.getX() << " " << tmp.getY() << std::endl;
+                    std::cout << tmp.getWidth() << " " << tmp.getHeight() << std::endl;
+
+                    alreadyMovedBack = true;
+                }
+            }
+        }
+    }
+
+    yPos += y;
+
+    character.translate(0, y);
+
+    alreadyMovedBack = false;
+
+    for (int i = 0; i < roomHeight; i++) {
+        for (int j = 0; j < roomWidth; j++) {
+            if (character.getHitbox().isColliding(*(*(roomHitboxesPtr + i) + j))) {
+                if ((*(*(roomHitboxesPtr + i) + j)).isBlocking() && !alreadyMovedBack) {
+                    yPos -= y;
+                    character.translate(0, -y);
+
+                    Hitbox tmp = character.getHitbox();
+
+                    std::cout << "b" << std::endl;
+                    std::cout << tmp.getX() << " " << tmp.getY() << std::endl;
+                    std::cout << tmp.getWidth() << " " << tmp.getHeight() << std::endl << std::endl;
+
+                    alreadyMovedBack = true;
+                }
+            }
+        }
+    }
 }
