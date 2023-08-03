@@ -36,7 +36,7 @@ int roomHeight = 10;
 void framebuffer_size_callback(GLFWwindow*, int, int);
 void processInput(GLFWwindow*);
 
-void checkHitboxInteractions(float, float);
+void checkHitboxInteractions(float*, float*);
 
 int main(void) {
 
@@ -161,14 +161,20 @@ void processInput(GLFWwindow* window) {
         xChange += speed;
     }
 
-    checkHitboxInteractions(xChange, yChange);
+    checkHitboxInteractions(&xChange, &yChange);
+
+    xPos += xChange;
+    yPos += yChange;
 
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
         character.shoot(0);
     }
 }
 
-void checkHitboxInteractions(float x, float y) {
+void checkHitboxInteractions(float* xPtr, float* yPtr) {
+    float x = *xPtr;
+    float y = *yPtr;
+
     room.getHitboxes(&roomHitboxesPtr, &roomWidth, &roomHeight);
 
     xPos += x;
@@ -181,7 +187,8 @@ void checkHitboxInteractions(float x, float y) {
         for (int j = 0; j < roomWidth; j++) {
             if (character.getHitbox().isColliding(*(*(roomHitboxesPtr + i) + j))) {
                 if ((*(*(roomHitboxesPtr + i) + j)).isBlocking() && !alreadyMovedBack) {
-                    xPos -= x;
+                    *xPtr -= x;
+
                     character.translate(-x, 0);
 
                     std::cout << "a" << std::endl;
@@ -197,6 +204,9 @@ void checkHitboxInteractions(float x, float y) {
         }
     }
 
+    xPos -= x;
+
+
     yPos += y;
 
     character.translate(0, y);
@@ -207,7 +217,8 @@ void checkHitboxInteractions(float x, float y) {
         for (int j = 0; j < roomWidth; j++) {
             if (character.getHitbox().isColliding(*(*(roomHitboxesPtr + i) + j))) {
                 if ((*(*(roomHitboxesPtr + i) + j)).isBlocking() && !alreadyMovedBack) {
-                    yPos -= y;
+                    *yPtr -= y;
+
                     character.translate(0, -y);
 
                     Hitbox tmp = character.getHitbox();
@@ -221,4 +232,6 @@ void checkHitboxInteractions(float x, float y) {
             }
         }
     }
+
+    yPos -= y;
 }
