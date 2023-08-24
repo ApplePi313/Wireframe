@@ -7,6 +7,9 @@
 #include "Entity/Hitbox.hpp"
 
 #include "World/Room.hpp"
+#include "World/Hall.hpp"
+
+#include "UniversalResources.hpp"
 
 /*
     Some things to remember:
@@ -14,6 +17,8 @@
         Coord system is the normal computer screen
         
 */
+
+UniversalResources resources;
 
 int windowWidth = 800;
 int windowHeight = 600;
@@ -32,6 +37,8 @@ Room room;
 Hitbox** roomHitboxesPtr;
 int roomWidth = 10;
 int roomHeight = 10;
+
+Hall hall;
 
 void framebuffer_size_callback(GLFWwindow*, int, int);
 void processInput(GLFWwindow*);
@@ -54,6 +61,8 @@ int main(void) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0); // gl version x.0 (both add up to 4.0)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
+    resources.windowWidth = windowWidth;
+    resources.windowHeight = windowHeight;
     GLFWwindow* window = glfwCreateWindow(windowWidth, windowHeight, "Window", NULL, NULL);
 
     if (window == NULL) {
@@ -79,6 +88,13 @@ int main(void) {
     // For if the window is resized
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);  
 
+
+    // Set the window title
+    glfwSetWindowTitle(window, "Wireframe");
+
+    glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);
+    glfwWindowHintString(GLFW_X11_CLASS_NAME, "Wireframe");
+
             /*
             
             Config Setup
@@ -94,6 +110,9 @@ int main(void) {
 
 
     character.setup("src/Assets/Characters/Player.attr", "src/Shaders/VertexShader.vert", "src/Shaders/FragmentShader.frag", 32.0f, windowWidth/2.0f - 16 + xPos, windowHeight/2.0f - 16 + yPos);
+
+    hall.setup(0.0f, 576.0f, 8, 4, 0, "src/Shaders/VertexShader.vert", "src/Shaders/FragmentShader.frag");
+
     room.setup(0.0f, 0.0f, roomWidth, roomHeight, 0, "src/Shaders/VertexShader.vert", "src/Shaders/FragmentShader.frag");
 
             /*
@@ -103,6 +122,12 @@ int main(void) {
             */
 
     while(!glfwWindowShouldClose(window)) {
+        glfwGetWindowSize(window, &resources.windowWidth, &resources.windowHeight); // update the screen dimensions in case of a resize
+        xPos += (windowWidth - resources.windowWidth) / 2;
+        yPos += (windowHeight - resources.windowHeight) / 2;
+        windowWidth = resources.windowWidth;
+        windowHeight = resources.windowHeight;
+
         // check inputs
         for (int i = 0; i < 10; i++) {
             processInput(window);
@@ -191,13 +216,6 @@ void checkHitboxInteractions(float* xPtr, float* yPtr) {
 
                     character.translate(-x, 0);
 
-                    std::cout << "a" << std::endl;
-
-                    Hitbox tmp = character.getHitbox();
-
-                    std::cout << tmp.getX() << " " << tmp.getY() << std::endl;
-                    std::cout << tmp.getWidth() << " " << tmp.getHeight() << std::endl;
-
                     alreadyMovedBack = true;
                 }
             }
@@ -223,14 +241,14 @@ void checkHitboxInteractions(float* xPtr, float* yPtr) {
 
                     Hitbox tmp = character.getHitbox();
 
-                    std::cout << "b" << std::endl;
-                    std::cout << tmp.getX() << " " << tmp.getY() << std::endl;
-                    std::cout << tmp.getWidth() << " " << tmp.getHeight() << std::endl << std::endl;
-
                     alreadyMovedBack = true;
+
+                    break;
                 }
             }
         }
+
+        if (alreadyMovedBack) break;
     }
 
     yPos -= y;

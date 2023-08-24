@@ -6,6 +6,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include "UniversalResources.hpp"
+
 /* Error Codes
     1: failed file read
     2: Shader compilation failed
@@ -32,6 +34,8 @@ class Shader {
     char infoLog[512];
 
     int error;
+
+    UniversalResources resources;
 
     public: 
 

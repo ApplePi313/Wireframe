@@ -52,7 +52,6 @@ void Character::draw(float windowWidth, float windowHeight, float x, float y) {
 
     shader.set2f("resize", width/2.0f, -width/2.0f);
     shader.set2f("dimensions", width, width);
-    shader.set2f("screenDimensions", windowWidth, windowHeight);
     shader.set2f("worldCoords", x, y);
     shader.set2f("coords", xPos, yPos);
 

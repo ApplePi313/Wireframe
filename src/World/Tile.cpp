@@ -44,7 +44,6 @@ void Tile::draw(float x, float y, Shader* shader) {
 
     // (*shader).set2f("worldCoords", x, y);
     (*shader).set2f("coords", xPos, yPos);
-
     (*shader).draw();
 }
 

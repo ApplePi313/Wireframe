@@ -77,8 +77,6 @@ bool Hitbox::isColliding(Hitbox otherHitbox) {
 
 bool Hitbox::isBlocking() {
     if (type == 1 || type == 3) {
-        std::cout << width << " " << height << std::endl;
-        std::cout << xPos << " " << yPos << std::endl;
     }
     return (type == 1 || type == 3);
 }

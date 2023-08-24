@@ -369,6 +369,7 @@ void Shader::activate() {
 
 void Shader::draw() {
     // Draw the object
+    set2f("screenDimensions", resources.windowWidth, resources.windowHeight);
     glDrawElements(GL_LINES, indicesLength, GL_UNSIGNED_INT, 0);
 
     return;

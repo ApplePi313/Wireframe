@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iostream>
+
 #include "World/Tile.hpp"
 #include "Shaders/Shader.hpp"
 #include "Rand.hpp"
@@ -8,6 +10,7 @@
 class Room {
     float xPos = 0.0f;
     float yPos = 0.0f;
+
     int width;
     int height;
 

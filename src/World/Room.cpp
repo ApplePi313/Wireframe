@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "World/Room.hpp"
 
 Room::Room() {}
@@ -16,7 +14,7 @@ void Room::setup(float x, float y, int roomWidth, int roomHeight, int roomDesign
     height = roomHeight;
 
     usableWidth = width - 2; // this accounts for the 1-thick walls
-    usableHeight = height - 2; 
+    usableHeight = height - 2;
 
     design = roomDesign;
 
@@ -26,8 +24,8 @@ void Room::setup(float x, float y, int roomWidth, int roomHeight, int roomDesign
     hitboxesPtr = new Hitbox*[height];
 
     for (int i = 0; i < height; i++) {
-        *(tilesPtr + i) = new Tile[height];
-        *(hitboxesPtr + i) = new Hitbox[height];
+        *(tilesPtr + i) = new Tile[width];
+        *(hitboxesPtr + i) = new Hitbox[width];
     }
 
     for (int i = 0; i < height; i++) {
@@ -108,8 +106,6 @@ void Room::draw(float x, float y) {
 
     shader.set2f("dimensions", 64.0f, 64.0f);
     shader.set2f("resize", 32, -32);
-    shader.set2f("screenDimensions", 800, 600);
-
     shader.set2f("worldCoords", x, y);
 
     for (int layer = 0; layer < 10; layer++) {
