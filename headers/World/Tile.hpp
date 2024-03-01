@@ -34,11 +34,15 @@ class Tile {
 
         Tile();
 
-        Tile(float, float, int, Shader*);
+        Tile(float, float, int);
 
-        void setDesign(int, Shader*);
+        void setDesign(int);
 
+        void drawTDSet(Shader*); // Draw, tile dimensions set
+        void draw(Shader*);
         void draw(float, float, Shader*);
 
         int getLayer();
+
+        Tile* getThis();
 };

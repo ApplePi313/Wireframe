@@ -2,10 +2,54 @@
 
 Hall::Hall() {}
 
+Hall::Hall(float x, float y, int hallTileWidth, int hallTileHeight, int hallOrientation, Tile** tilesPtr, Hitbox** hitboxesPtr, int tilesOffsetX, int tilesOffsetY) {
+    altSetup(x, y, hallTileWidth, hallTileHeight, hallOrientation, tilesPtr, hitboxesPtr, tilesOffsetX, tilesOffsetY);
+}
+
 Hall::Hall(float x, float y, int hallTileWidth, int hallTileHeight, int hallOrientation, const char* vertexShaderFile, const char* fragmentShaderFile) {
     setup(x, y, hallTileWidth, hallTileHeight, hallOrientation, vertexShaderFile, fragmentShaderFile);
 }
 
+void Hall::altSetup(float x, float y, int hallTileWidth, int hallTileHeight, int hallOrientation, Tile** hallTilesPtr, Hitbox** hallHitboxesPtr, int tilesOffsetX, int tilesOffsetY) {
+    xPos = x;
+    yPos = y;
+
+    tileWidth = hallTileWidth;
+    tileHeight = hallTileHeight;
+
+    orientation = hallOrientation;
+
+    tilesPtr = hallTilesPtr;
+    hitboxesPtr = hallHitboxesPtr;
+
+    for (int i = tilesOffsetY; i < tileHeight + tilesOffsetY; i++) {
+        for (int j = tilesOffsetX; j < tileWidth + tilesOffsetX; j++) {
+            tilesPtr[i][j] = Tile(xPos + j * 64.0f, yPos + i * 64.0f, 64);
+            hitboxesPtr[i][j] = Hitbox(xPos + j * 64.0f, yPos + i * 64.0f, 64.0f, 64.0f, 0);
+        }
+    }
+
+    if (orientation == 0) {
+        for (int i = tilesOffsetX; i < tileWidth + tilesOffsetX; i++) { // set the side walls of the room
+            tilesPtr[tilesOffsetY][i].setDesign(2);
+            hitboxesPtr[tilesOffsetY][i].setType(1);
+
+            tilesPtr[tileHeight - 1 + tilesOffsetY][i].setDesign(2);
+            hitboxesPtr[tileHeight - 1 + tilesOffsetY][i].setType(1);
+        }
+    } else if (orientation == 1) {
+        for (int i = tilesOffsetY; i < tileHeight + tilesOffsetY; i++) {
+            tilesPtr[i][tilesOffsetX].setDesign(2);
+            hitboxesPtr[i][tilesOffsetX].setType(1);
+
+            tilesPtr[i][tileWidth - 1 + tilesOffsetX].setDesign(2);
+            hitboxesPtr[i][tileWidth - 1 + tilesOffsetX].setType(1);
+        }
+    } else {
+        std::cout << "Invalid orientation: " << orientation << " for a hall" << std::endl;
+        error = 1;
+    }
+}
 void Hall::setup(float x, float y, int hallTileWidth, int hallTileHeight, int hallOrientation, const char* vertexShaderFile, const char* fragmentShaderFile) {
     xPos = x;
     yPos = y;
@@ -27,25 +71,25 @@ void Hall::setup(float x, float y, int hallTileWidth, int hallTileHeight, int ha
 
     for (int i = 0; i < tileHeight; i++) {
         for (int j = 0; j < tileWidth; j++) {
-            *(*(tilesPtr + i) + j) = Tile(xPos + j * 64.0f, yPos + i * 64.0f, 64, &shader);
+            *(*(tilesPtr + i) + j) = Tile(xPos + j * 64.0f, yPos + i * 64.0f, 64);
             *(*(hitboxesPtr + i) + j) = Hitbox(xPos + j * 64.0f, yPos + i * 64.0f, 64.0f, 64.0f, 0);
         }
     }
 
     if (orientation == 0) {
         for (int i = 0; i < tileWidth; i++) { // set the side walls of the room
-            (*(*(tilesPtr + 0) + i)).setDesign(2, &shader);
+            (*(*(tilesPtr + 0) + i)).setDesign(2);
             (*(*(hitboxesPtr + 0) + i)).setType(1);
 
-            (*(*(tilesPtr + tileHeight - 1) + i)).setDesign(2, &shader);
+            (*(*(tilesPtr + tileHeight - 1) + i)).setDesign(2);
             (*(*(hitboxesPtr + tileHeight - 1) + i)).setType(1);
         }
     } else if (orientation == 1) {
         for (int i = 0; i < tileHeight; i++) {
-            (*(*(tilesPtr + i) + 0)).setDesign(2, &shader);
+            (*(*(tilesPtr + i) + 0)).setDesign(2);
             (*(*(hitboxesPtr + i) + 0)).setType(1);
 
-            (*(*(tilesPtr + i) + tileWidth - 1)).setDesign(2, &shader);
+            (*(*(tilesPtr + i) + tileWidth - 1)).setDesign(2);
             (*(*(hitboxesPtr + i) + tileWidth - 1)).setType(1);
         }
     } else {

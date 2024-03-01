@@ -76,7 +76,5 @@ bool Hitbox::isColliding(Hitbox otherHitbox) {
 }
 
 bool Hitbox::isBlocking() {
-    if (type == 1 || type == 3) {
-    }
     return (type == 1 || type == 3);
 }

@@ -126,7 +126,6 @@ void AttributesParser::parseVertices() {
             */
 
     fInStrm.seekg(0);
-
     while(fInStrm.get(extractedChar)) { // find start of vertices
         if (extractedChar == 'v') {
             break;
@@ -134,7 +133,6 @@ void AttributesParser::parseVertices() {
     }
 
     verticesStart = fInStrm.tellg();
-
     verticesLen = 0;
 
     while(fInStrm.get(extractedChar)) { // find end and determine the length

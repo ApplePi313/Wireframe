@@ -7,3 +7,7 @@ int Rand::getInt() {
 int Rand::getPositiveInt() {
     return positiveRandGen(randSrc);
 }
+
+bool Rand::chance(int chance) {
+    return getPositiveInt() % 100 < chance;
+}

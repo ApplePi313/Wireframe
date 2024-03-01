@@ -35,9 +35,10 @@ class Hall {
 
     public:
         Hall();
-
+        Hall(float, float, int, int, int, Tile**, Hitbox**, int, int); // x, y, tile width, tile height, orientation, tiles, hitboxes, tilesOffsetX, tilesOffsetY
         Hall(float, float, int, int, int, const char*, const char*); // x, y, tile width, tile height, orientation
 
+        void altSetup(float, float, int, int, int, Tile**, Hitbox**, int, int); // x, y, tile width, tile height, orientation, tiles, hitboxes, tilesOffsetX, tilesOffsetY
         void setup(float, float, int, int, int, const char*, const char*); // x, y, tile width, tile height, orientation
 
         void draw(float, float);

@@ -8,7 +8,9 @@
 
 #include "World/Room.hpp"
 #include "World/Hall.hpp"
+#include "World/Level.hpp"
 
+#include "Writer.hpp"
 #include "UniversalResources.hpp"
 
 /*
@@ -19,6 +21,7 @@
 */
 
 UniversalResources resources;
+Writer writer;
 
 int windowWidth = 800;
 int windowHeight = 600;
@@ -29,16 +32,19 @@ float yPos = 0;
 float xChange = 0.0f;
 float yChange = 0.0f;
 
-float speed = 1;
+float speed = 0.5;
 
 Character character;
 
-Room room;
-Hitbox** roomHitboxesPtr;
-int roomWidth = 10;
-int roomHeight = 10;
+// Room room;
 
-Hall hall;
+Level level;
+
+Hitbox** levelHitboxesPtr;
+int levelWidth = 81;
+int levelHeight = 41;
+
+// Hall hall;
 
 void framebuffer_size_callback(GLFWwindow*, int, int);
 void processInput(GLFWwindow*);
@@ -111,9 +117,15 @@ int main(void) {
 
     character.setup("src/Assets/Characters/Player.attr", "src/Shaders/VertexShader.vert", "src/Shaders/FragmentShader.frag", 32.0f, windowWidth/2.0f - 16 + xPos, windowHeight/2.0f - 16 + yPos);
 
-    hall.setup(0.0f, 576.0f, 8, 4, 0, "src/Shaders/VertexShader.vert", "src/Shaders/FragmentShader.frag");
+    // hall.setup(0.0f, 576.0f, 8, 4, 0, "src/Shaders/VertexShader.vert", "src/Shaders/FragmentShader.frag");
 
-    room.setup(0.0f, 0.0f, roomWidth, roomHeight, 0, "src/Shaders/VertexShader.vert", "src/Shaders/FragmentShader.frag");
+    // room.setup(0.0f, 0.0f, levelWidth, levelHeight, 0, "src/Shaders/VertexShader.vert", "src/Shaders/FragmentShader.frag");
+
+    // room.formEntry(0, 2, 2);
+
+    // Room bleh = Room(0.0f, 0.0f, levelWidth, levelHeight, 0, "src/Shaders/VertexShader.vert", "src/Shaders/FragmentShader.frag");
+
+    level = Level(0.0f, 0.0f, levelWidth, levelHeight, "src/Shaders/VertexShader.vert", "src/Shaders/FragmentShader.frag");
 
             /*
             
@@ -134,9 +146,10 @@ int main(void) {
         }
 
         // clear the screen
-        glClearColor(0.2f, 0.2f, 0.2f, 1.0f); // currently clears to be black
+        glClearColor(0.2f, 0.2f, 0.2f, 1.0f); // currently clears to be grey
         glClear(GL_COLOR_BUFFER_BIT);
 
+        // writer.render_text("hello", 50, 50, 24, 24);
 
         /*
         
@@ -144,7 +157,7 @@ int main(void) {
         
         */ 
 
-        room.draw(xPos, yPos);
+        level.draw(xPos, yPos);
 
         character.draw(windowWidth, windowHeight, xPos, yPos);
 
@@ -156,7 +169,7 @@ int main(void) {
 
     glfwTerminate();
 
-    room.close();
+    // room.close();
 
 
     return 0;
@@ -185,6 +198,9 @@ void processInput(GLFWwindow* window) {
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
         xChange += speed;
     }
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_RELEASE) {
+        // generate hall
+    }
 
     checkHitboxInteractions(&xChange, &yChange);
 
@@ -200,7 +216,7 @@ void checkHitboxInteractions(float* xPtr, float* yPtr) {
     float x = *xPtr;
     float y = *yPtr;
 
-    room.getHitboxes(&roomHitboxesPtr, &roomWidth, &roomHeight);
+    level.getHitboxes(&levelHitboxesPtr, &levelWidth, &levelHeight);
 
     xPos += x;
 
@@ -208,10 +224,10 @@ void checkHitboxInteractions(float* xPtr, float* yPtr) {
 
     bool alreadyMovedBack = false;
 
-    for (int i = 0; i < roomHeight; i++) {
-        for (int j = 0; j < roomWidth; j++) {
-            if (character.getHitbox().isColliding(*(*(roomHitboxesPtr + i) + j))) {
-                if ((*(*(roomHitboxesPtr + i) + j)).isBlocking() && !alreadyMovedBack) {
+    for (int i = 0; i < levelHeight; i++) {
+        for (int j = 0; j < levelWidth; j++) {
+            if (character.getHitbox().isColliding(*(*(levelHitboxesPtr + i) + j))) {
+                if ((*(*(levelHitboxesPtr + i) + j)).isBlocking() && !alreadyMovedBack) {
                     *xPtr -= x;
 
                     character.translate(-x, 0);
@@ -231,10 +247,10 @@ void checkHitboxInteractions(float* xPtr, float* yPtr) {
 
     alreadyMovedBack = false;
 
-    for (int i = 0; i < roomHeight; i++) {
-        for (int j = 0; j < roomWidth; j++) {
-            if (character.getHitbox().isColliding(*(*(roomHitboxesPtr + i) + j))) {
-                if ((*(*(roomHitboxesPtr + i) + j)).isBlocking() && !alreadyMovedBack) {
+    for (int i = 0; i < levelHeight; i++) {
+        for (int j = 0; j < levelWidth; j++) {
+            if (character.getHitbox().isColliding(*(*(levelHitboxesPtr + i) + j))) {
+                if ((*(*(levelHitboxesPtr + i) + j)).isBlocking() && !alreadyMovedBack) {
                     *yPtr -= y;
 
                     character.translate(0, -y);

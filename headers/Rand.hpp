@@ -13,4 +13,5 @@ class Rand {
     public: 
         static int getInt();
         static int getPositiveInt();
+        static bool chance(int);
 };
