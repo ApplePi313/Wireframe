@@ -2,16 +2,15 @@
 
 Room::Room() {}
 
-Room::Room(float x, float y, int roomWidth, int roomHeight, int roomDesign, const char* vertexShaderFile, const char* fragmentShaderFile) {
-    setup(x, y, roomWidth, roomHeight, roomDesign, vertexShaderFile, fragmentShaderFile);
+Room::Room(Coord c, int roomWidth, int roomHeight, int roomDesign, const char* vertexShaderFile, const char* fragmentShaderFile) {
+    setup(c, roomWidth, roomHeight, roomDesign, vertexShaderFile, fragmentShaderFile);
 }
-Room::Room(float x, float y, int roomWidth, int roomHeight, int roomDesign, Tile** tilesPtr, Hitbox** hitboxesPtr, int tilesOffsetX, int tilesOffsetY) {
-    setup(x, y, roomWidth, roomHeight, roomDesign, tilesPtr, hitboxesPtr, tilesOffsetX, tilesOffsetY);
+Room::Room(Coord c, int roomWidth, int roomHeight, int roomDesign, Tile** tilesPtr, Hitbox** hitboxesPtr, int tilesOffsetX, int tilesOffsetY) {
+    setup(c, roomWidth, roomHeight, roomDesign, tilesPtr, hitboxesPtr, tilesOffsetX, tilesOffsetY);
 }
 
-void Room::setup(float x, float y, int roomWidth, int roomHeight, int roomDesign, const char* vertexShaderFile, const char* fragmentShaderFile) {
-    xPos = x;
-    yPos = y;
+void Room::setup(Coord c, int roomWidth, int roomHeight, int roomDesign, const char* vertexShaderFile, const char* fragmentShaderFile) {
+    coords = c;
 
     width = roomWidth;
     height = roomHeight;
@@ -27,37 +26,36 @@ void Room::setup(float x, float y, int roomWidth, int roomHeight, int roomDesign
     hitboxesPtr = new Hitbox*[height];
 
     for (int i = 0; i < height; i++) { // inner layer(1 pointer level) is height
-        *(tilesPtr + i) = new Tile[width]; // outer layer(0 pointer levels) is width
-        *(hitboxesPtr + i) = new Hitbox[width];
+        tilesPtr[i] = new Tile[width]; // outer layer(0 pointer levels) is width
+        hitboxesPtr[i] = new Hitbox[width];
     }
 
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
-            *(*(tilesPtr + i) + j) = Tile(xPos + j * 64.0f, yPos + i * 64.0f, 64);
-            *(*(hitboxesPtr + i) + j) = Hitbox(xPos + j * 64.0f, yPos + i * 64.0f, 64.0f, 64.0f, 0);
+            tilesPtr[i][j] = Tile(c + Coord(j * 64.0f, i * 64.0f), 64);
+            hitboxesPtr[i][j] = Hitbox(c + Coord(j * 64.0f, i * 64.0f), 64.0f, 64.0f, 0);
         }
     }
 
     for (int i = 0; i < width; i++) { // set the side walls of the room
-        (*(*(tilesPtr + 0) + i)).setDesign(2);
-        (*(*(hitboxesPtr + 0) + i)).setType(1);
+        tilesPtr[0][i].setDesign(2);
+        hitboxesPtr[0][i].setType(1);
 
-        (*(*(tilesPtr + height - 1) + i)).setDesign(2);
-        (*(*(hitboxesPtr + height - 1) + i)).setType(1);
+        tilesPtr[height-1][i].setDesign(2);
+        hitboxesPtr[height-1][i].setType(1);
     }
     for (int i = 0; i < height - 2; i++) {
-        (*(*(tilesPtr + i + 1) + 0)).setDesign(2);
-        (*(*(hitboxesPtr + i + 1) + 0)).setType(1);
+        tilesPtr[i+1][0].setDesign(2);
+        hitboxesPtr[i+1][0].setType(1);
 
-        (*(*(tilesPtr + i + 1) + width - 1)).setDesign(2);
-        (*(*(hitboxesPtr + i + 1) + width - 1)).setType(1);
+        tilesPtr[i+1][width-1].setDesign(2);
+        hitboxesPtr[i+1][width-1].setType(1);
     }
 
     generate(0, 0);
 }
-void Room::setup(float x, float y, int roomWidth, int roomHeight, int roomDesign, Tile** roomTilesPtr, Hitbox** roomHitboxesPtr, int tilesOffsetX, int tilesOffsetY) {
-    xPos = x;
-    yPos = y;
+void Room::setup(Coord c, int roomWidth, int roomHeight, int roomDesign, Tile** roomTilesPtr, Hitbox** roomHitboxesPtr, int tilesOffsetX, int tilesOffsetY) {
+    coords = c;
 
     width = roomWidth;
     height = roomHeight;
@@ -77,33 +75,30 @@ void Room::setup(float x, float y, int roomWidth, int roomHeight, int roomDesign
 
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
-            *(*(tilesPtr + i + tilesOffsetY) + j + tilesOffsetX) = Tile(xPos + j * 64.0f, yPos + i * 64.0f, 64);
-            *(*(hitboxesPtr + i + tilesOffsetY) + j + tilesOffsetX) = Hitbox(xPos + j * 64.0f, yPos + i * 64.0f, 64.0f, 64.0f, 0);
+            tilesPtr[i+tilesOffsetY][j+tilesOffsetX] = Tile(c + Coord(j * 64.0f, i * 64.0f), 64);
+            hitboxesPtr[i+tilesOffsetY][j+tilesOffsetX] = Hitbox(c + Coord(j * 64.0f, i * 64.0f), 64.0f, 64.0f, 0);
         }
     }
 
     for (int i = 0; i < width; i++) { // set the side walls of the room
-        (*(*(tilesPtr + 0 + tilesOffsetY) + i + tilesOffsetX)).setDesign(2);
-        (*(*(hitboxesPtr + 0 + tilesOffsetY) + i + tilesOffsetX)).setType(1);
+        tilesPtr[tilesOffsetY][i+tilesOffsetX].setDesign(2);
+        hitboxesPtr[tilesOffsetY][i+tilesOffsetX].setType(1);
 
-        (*(*(tilesPtr + height - 1 + tilesOffsetY) + i + tilesOffsetX)).setDesign(2);
-        (*(*(hitboxesPtr + height - 1 + tilesOffsetY) + i + tilesOffsetX)).setType(1);
+        tilesPtr[height-1+tilesOffsetY][i+tilesOffsetX].setDesign(2);
+        hitboxesPtr[height-1+tilesOffsetY][i+tilesOffsetX].setType(1);
     }
     for (int i = 0; i < height - 2; i++) {
-        (*(*(tilesPtr + i + 1 + tilesOffsetY) + 0 + tilesOffsetX)).setDesign(2);
-        (*(*(hitboxesPtr + i + 1 + tilesOffsetY) + 0 + tilesOffsetX)).setType(1);
+        tilesPtr[i+1+tilesOffsetY][tilesOffsetX].setDesign(2);
+        hitboxesPtr[i+1+tilesOffsetY][tilesOffsetX].setType(1);
 
-        (*(*(tilesPtr + i + 1 + tilesOffsetY) + width - 1 + tilesOffsetX)).setDesign(2);
-        (*(*(hitboxesPtr + i + 1 + tilesOffsetY) + width - 1 + tilesOffsetX)).setType(1);
+        tilesPtr[i+1+tilesOffsetY][width-1+tilesOffsetX].setDesign(2);
+        hitboxesPtr[i+1+tilesOffsetY][width-1+tilesOffsetX].setType(1);
     }
 
     generate(tilesOffsetX, tilesOffsetY);
 }
 
 void Room::generate(int tilesOffsetX, int tilesOffsetY) {
-    
-    std::cout << "rand test: " << randGen.getPositiveInt() << std::endl;
-
     switch (design) {
         case 0: 
             numBoxes = (randGen.getPositiveInt()) % 10 + 3; // min 3 max 12 boxes
@@ -244,12 +239,12 @@ void Room::activateShader() {
     shader.activate();
 }
 
-void Room::draw(float x, float y) {
+void Room::draw(Coord c) {
     activateShader();
 
     shader.set2f("dimensions", 64.0f, 64.0f);
     shader.set2f("resize", 32, -32);
-    shader.set2f("worldCoords", x, y);
+    shader.set2f("worldCoords", c.x, c.y);
 
     for (int layer = 0; layer < 10; layer++) {
         for (int i = 0; i < height; i++) {

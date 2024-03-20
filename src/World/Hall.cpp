@@ -2,17 +2,16 @@
 
 Hall::Hall() {}
 
-Hall::Hall(float x, float y, int hallTileWidth, int hallTileHeight, int hallOrientation, Tile** tilesPtr, Hitbox** hitboxesPtr, int tilesOffsetX, int tilesOffsetY) {
-    altSetup(x, y, hallTileWidth, hallTileHeight, hallOrientation, tilesPtr, hitboxesPtr, tilesOffsetX, tilesOffsetY);
+Hall::Hall(Coord c, int hallTileWidth, int hallTileHeight, int hallOrientation, Tile** tilesPtr, Hitbox** hitboxesPtr, int tilesOffsetX, int tilesOffsetY) {
+    altSetup(c, hallTileWidth, hallTileHeight, hallOrientation, tilesPtr, hitboxesPtr, tilesOffsetX, tilesOffsetY);
 }
 
-Hall::Hall(float x, float y, int hallTileWidth, int hallTileHeight, int hallOrientation, const char* vertexShaderFile, const char* fragmentShaderFile) {
-    setup(x, y, hallTileWidth, hallTileHeight, hallOrientation, vertexShaderFile, fragmentShaderFile);
+Hall::Hall(Coord c, int hallTileWidth, int hallTileHeight, int hallOrientation, const char* vertexShaderFile, const char* fragmentShaderFile) {
+    setup(c, hallTileWidth, hallTileHeight, hallOrientation, vertexShaderFile, fragmentShaderFile);
 }
 
-void Hall::altSetup(float x, float y, int hallTileWidth, int hallTileHeight, int hallOrientation, Tile** hallTilesPtr, Hitbox** hallHitboxesPtr, int tilesOffsetX, int tilesOffsetY) {
-    xPos = x;
-    yPos = y;
+void Hall::altSetup(Coord c, int hallTileWidth, int hallTileHeight, int hallOrientation, Tile** hallTilesPtr, Hitbox** hallHitboxesPtr, int tilesOffsetX, int tilesOffsetY) {
+    coords = c;
 
     tileWidth = hallTileWidth;
     tileHeight = hallTileHeight;
@@ -24,8 +23,8 @@ void Hall::altSetup(float x, float y, int hallTileWidth, int hallTileHeight, int
 
     for (int i = tilesOffsetY; i < tileHeight + tilesOffsetY; i++) {
         for (int j = tilesOffsetX; j < tileWidth + tilesOffsetX; j++) {
-            tilesPtr[i][j] = Tile(xPos + j * 64.0f, yPos + i * 64.0f, 64);
-            hitboxesPtr[i][j] = Hitbox(xPos + j * 64.0f, yPos + i * 64.0f, 64.0f, 64.0f, 0);
+            tilesPtr[i][j] = Tile(coords + Coord(j * 64.0f, i * 64.0f), 64);
+            hitboxesPtr[i][j] = Hitbox(coords + Coord(j * 64.0f, i * 64.0f), 64.0f, 64.0f, 0);
         }
     }
 
@@ -50,9 +49,8 @@ void Hall::altSetup(float x, float y, int hallTileWidth, int hallTileHeight, int
         error = 1;
     }
 }
-void Hall::setup(float x, float y, int hallTileWidth, int hallTileHeight, int hallOrientation, const char* vertexShaderFile, const char* fragmentShaderFile) {
-    xPos = x;
-    yPos = y;
+void Hall::setup(Coord c, int hallTileWidth, int hallTileHeight, int hallOrientation, const char* vertexShaderFile, const char* fragmentShaderFile) {
+    coords = c;
 
     tileWidth = hallTileWidth;
     tileHeight = hallTileHeight;
@@ -71,8 +69,8 @@ void Hall::setup(float x, float y, int hallTileWidth, int hallTileHeight, int ha
 
     for (int i = 0; i < tileHeight; i++) {
         for (int j = 0; j < tileWidth; j++) {
-            *(*(tilesPtr + i) + j) = Tile(xPos + j * 64.0f, yPos + i * 64.0f, 64);
-            *(*(hitboxesPtr + i) + j) = Hitbox(xPos + j * 64.0f, yPos + i * 64.0f, 64.0f, 64.0f, 0);
+            *(*(tilesPtr + i) + j) = Tile(coords + Coord(j * 64.0f, i * 64.0f), 64);
+            *(*(hitboxesPtr + i) + j) = Hitbox(coords + Coord(j * 64.0f, i * 64.0f), 64.0f, 64.0f, 0);
         }
     }
 
@@ -98,17 +96,17 @@ void Hall::setup(float x, float y, int hallTileWidth, int hallTileHeight, int ha
     }
 }
 
-void Hall::draw(float x, float y) {
+void Hall::draw(Coord c) {
     activateShader();
 
     shader.set2f("dimensions", 64.0f, 64.0f);
     shader.set2f("resize", 32, -32);
-    shader.set2f("worldCoords", x, y);
+    shader.set2f("worldCoords", c.x, c.y);
 
     for (int layer = 0; layer < 10; layer++) {
         for (int i = 0; i < tileHeight; i++) {
             for (int j = 0; j < tileWidth; j++) {
-                if ((*(*(tilesPtr + i) + j)).getLayer() == layer) (*(*(tilesPtr + i) + j)).draw(x, y, &shader);
+                if ((*(*(tilesPtr + i) + j)).getLayer() == layer) (*(*(tilesPtr + i) + j)).draw(c, &shader);
             }
         }
     }

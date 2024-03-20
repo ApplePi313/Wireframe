@@ -4,9 +4,8 @@ Tile::Tile() {
     setDesign(0);
 }
 
-Tile::Tile(float x, float y, int tileSize) {
-    xPos = x;
-    yPos = y;
+Tile::Tile(Coord c, int tileSize) {
+    coords = c;
 
     size = tileSize;
 
@@ -38,9 +37,9 @@ void Tile::setDesign(int tileDesign) {
 void Tile::drawTDSet(Shader* shader) { // Ideally the world coords and tile dimensions are already set
     glLineWidth(attributesParser.strokeWidth);
 
-    (*shader).setVertices(attributesParser.verticesPtr, attributesParser.verticesLen, attributesParser.indicesPtr, attributesParser.indicesLen);
+    (*shader).updateVertices(attributesParser.verticesPtr, attributesParser.verticesLen, attributesParser.indicesPtr, attributesParser.indicesLen);
 
-    (*shader).set2f("coords", xPos, yPos);
+    (*shader).set2f("coords", coords.x, coords.y);
     (*shader).draw();
 }
 
@@ -54,11 +53,11 @@ void Tile::draw(Shader* shader) { // Less ideally just the world coords are alre
     (*shader).set2f("dimensions", size, size);
     (*shader).set2f("resize", size/2.0f, -size/2.0f);
 
-    (*shader).set2f("coords", xPos, yPos);
+    (*shader).set2f("coords", coords.x, coords.y);
     (*shader).draw();
 }
 
-void Tile::draw(float worldX, float worldY, Shader* shader) {
+void Tile::draw(Coord c, Shader* shader) {
     glLineWidth(attributesParser.strokeWidth);
 
     (*shader).setVertices(attributesParser.verticesPtr, attributesParser.verticesLen, attributesParser.indicesPtr, attributesParser.indicesLen);
@@ -68,8 +67,8 @@ void Tile::draw(float worldX, float worldY, Shader* shader) {
     (*shader).set2f("dimensions", 64.0f, 64.0f);
     (*shader).set2f("resize", 32, -32);
 
-    (*shader).set2f("worldCoords", worldX, worldY);
-    (*shader).set2f("coords", xPos, yPos);
+    (*shader).set2f("worldCoords", c.x, c.x);
+    (*shader).set2f("coords", coords.x, coords.y);
     (*shader).draw();
 }
 

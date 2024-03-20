@@ -15,8 +15,7 @@ class Hall {
      */
     int error = 0;
 
-    float xPos = 0.0f;
-    float yPos = 0.0f;
+    Coord coords;
 
     int tileWidth = 0;
     int tileHeight = 0;
@@ -35,13 +34,13 @@ class Hall {
 
     public:
         Hall();
-        Hall(float, float, int, int, int, Tile**, Hitbox**, int, int); // x, y, tile width, tile height, orientation, tiles, hitboxes, tilesOffsetX, tilesOffsetY
-        Hall(float, float, int, int, int, const char*, const char*); // x, y, tile width, tile height, orientation
+        Hall(Coord, int, int, int, Tile**, Hitbox**, int, int); // x, y, tile width, tile height, orientation, tiles, hitboxes, tilesOffsetX, tilesOffsetY
+        Hall(Coord, int, int, int, const char*, const char*); // x, y, tile width, tile height, orientation
 
-        void altSetup(float, float, int, int, int, Tile**, Hitbox**, int, int); // x, y, tile width, tile height, orientation, tiles, hitboxes, tilesOffsetX, tilesOffsetY
-        void setup(float, float, int, int, int, const char*, const char*); // x, y, tile width, tile height, orientation
+        void altSetup(Coord, int, int, int, Tile**, Hitbox**, int, int); // x, y, tile width, tile height, orientation, tiles, hitboxes, tilesOffsetX, tilesOffsetY
+        void setup(Coord, int, int, int, const char*, const char*); // x, y, tile width, tile height, orientation
 
-        void draw(float, float);
+        void draw(Coord);
 
         void activateShader();
 

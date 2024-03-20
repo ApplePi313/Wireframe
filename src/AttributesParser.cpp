@@ -29,6 +29,8 @@ void AttributesParser::readFile(const char* inFile) {
                 break;
             case 1:
                 parseBulletSpawns();
+                parseBulletVertices();
+                parseBulletIndices();
 
                 break;
         }
@@ -95,7 +97,7 @@ void AttributesParser::parseAttributes() {
         }
 
         if (extractedChar == ',' || extractedChar == 'e') {
-            attribute += "";
+            attribute += '\0';
 
             attributes[currIndex] = std::stoi(attribute);
 
@@ -158,17 +160,17 @@ void AttributesParser::parseVertices() {
 
     currIndex = 0;
 
-    vertice.clear();
+    vertex.clear();
 
     while (currIndex != verticesLen) {
 
         if (fInStrm.get(extractedChar)) {
             if (extractedChar == ',' || extractedChar == 'e') {
-            vertice += "";
+            vertex += '\0';
 
-            vertices[currIndex] = std::stof(vertice);
+            vertices[currIndex] = std::stof(vertex);
 
-            vertice.clear();
+            vertex.clear();
 
             currIndex++;
 
@@ -176,7 +178,7 @@ void AttributesParser::parseVertices() {
             continue;
 
         } else {
-            vertice += extractedChar;
+            vertex += extractedChar;
 
         }
 
@@ -233,12 +235,12 @@ void AttributesParser::parseIndices() {
     int indices[indicesLen];
 
     for (int i = 0; i < indicesLen; i++) {
-        indices[i] = 1.0f;
+        indices[i] = 1;
     }
 
     currIndex = 0;
 
-    indice.clear();
+    index.clear();
 
     while (currIndex != indicesLen) {
 
@@ -254,11 +256,11 @@ void AttributesParser::parseIndices() {
         }
 
         if (extractedChar == ',' || extractedChar == 'e') {
-            indice += "";
+            index += '\0';
 
-            indices[currIndex] = std::stoi(indice);
+            indices[currIndex] = std::stoi(index);
 
-            indice.clear();
+            index.clear();
 
             currIndex++;
 
@@ -266,7 +268,7 @@ void AttributesParser::parseIndices() {
             continue;
 
         } else {
-            indice += extractedChar;
+            index += extractedChar;
 
         }
     }
@@ -303,18 +305,18 @@ void AttributesParser::parseStroke() {
     // Start parsing stroke
     fInStrm.seekg(strokeStart);
 
-    vertice.clear();
+    vertex.clear();
 
     currIndex = 0;
 
     while (currIndex == 0) {
         if (fInStrm.get(extractedChar)) {
             if (extractedChar == ',' || extractedChar == 'e') {
-            vertice += "";
+            vertex += '\0';
 
-            strokeWidth = std::stof(vertice);
+            strokeWidth = std::stof(vertex);
 
-            vertice.clear();
+            vertex.clear();
 
             currIndex = 1;
 
@@ -322,7 +324,7 @@ void AttributesParser::parseStroke() {
                 continue;
 
             } else {
-                vertice += extractedChar;
+                vertex += extractedChar;
 
             }
 
@@ -392,7 +394,7 @@ void AttributesParser::parseBulletSpawns() {
 
         if (fInStrm.get(extractedChar)) {
             if (extractedChar == ',' || extractedChar == 'e') {
-            bulletSpawn += "";
+            bulletSpawn += '\0';
 
             bulletSpawns[currIndex] = std::stof(bulletSpawn);
 
@@ -421,5 +423,171 @@ void AttributesParser::parseBulletSpawns() {
     bulletSpawnsPtr = new float[bulletSpawnsLen];
     for (int i = 0; i < bulletSpawnsLen; i++) {
         *(bulletSpawnsPtr + i) = *(bulletSpawns + i);
+    }
+}
+
+void AttributesParser::parseBulletVertices() {
+    int counter = 0;
+            /*
+
+            Vertices Parsing
+
+            */
+    extractedChars = new char[100];
+    fInStrm.seekg(0);
+    while(fInStrm.getline(extractedChars, 100, '\n')) { // find start of vertices
+        // fInStrm.seekg(fInStrm.tellg() + 1);
+        if (!strcmp(extractedChars, "bv")) {
+            // if (fInStrm.get(extractedChars, 2)) {
+            //     if (extractedChars[0] >= 48 && extractedChars[0] < 58) {
+            //         std::cout << "cool" << std::endl;
+            //     }
+            //     std::cout << extractedChars[0] << std::endl;
+            // }
+            break;
+        }
+        counter++;
+        if (counter > 50) break;
+    }
+    delete[] extractedChars;
+
+    bulletVerticesStart = fInStrm.tellg();
+    bulletVerticesLen = 0;
+    
+    while(fInStrm.get(extractedChar)) { // find end and determine the length
+        if (extractedChar == 'e') {
+            bulletVerticesLen++; // adds one to the vertex count because there isn't a comma after the last one
+            break;
+        }
+
+        if (extractedChar == ',') { // counts the number of vertices
+            bulletVerticesLen++;
+        }
+    }
+
+    // Start parsing vertices
+    fInStrm.seekg(bulletVerticesStart);
+
+    float bulletVertices[bulletVerticesLen];
+
+    for (int i = 0; i < bulletVerticesLen; i++) {
+        bulletVertices[i] = 1.0f;
+    }
+
+    currIndex = 0;
+
+    bulletVertex.clear();
+
+    while (currIndex < bulletVerticesLen) {
+        if (fInStrm.get(extractedChar)) {
+            if (extractedChar == ',' || extractedChar == 'e') {
+                bulletVertex += '\0';
+
+                bulletVertices[currIndex] = std::stof(bulletVertex);
+                bulletVertex.clear();
+
+                currIndex++;
+
+            } else if (extractedChar == '\n' || extractedChar == ' ' || extractedChar == 'f') {
+                continue;
+
+            } else {
+                bulletVertex += extractedChar;
+
+            }
+        } else {
+            error = 2;
+
+            std::cout << "Failed to read character when parsing vertices file(probably ran out of characters, how does this happen)" << std::endl;
+
+            break;
+        }
+    }
+
+
+    bulletVerticesPtr = new float[bulletVerticesLen];
+    for (int i = 0; i < bulletVerticesLen; i++) {
+        *(bulletVerticesPtr + i) = *(bulletVertices + i);
+    }
+}
+
+void AttributesParser::parseBulletIndices() {
+            /*
+
+            Indices Parsing
+
+            */
+
+    fInStrm.seekg(0);
+
+    extractedChars = new char[100];
+    while(fInStrm.getline(extractedChars, 100, '\n')) { // find start of indices
+        if (!strcmp(extractedChars, "bi")) {
+           
+            break;
+        }
+    }
+    delete[] extractedChars;
+
+    bulletIndicesStart = fInStrm.tellg();
+
+    bulletIndicesLen = 0;
+
+    while(fInStrm.get(extractedChar)) { // find end and determine the length
+
+        if (extractedChar == 'e') {
+            bulletIndicesLen++; // adds one to the vertex count because there isn't a comma after the last one
+            break;
+        }
+
+        if (extractedChar == ',') { // counts the number of indices
+            bulletIndicesLen++;
+        }
+    }
+
+    // Start parsing indices
+    fInStrm.seekg(bulletIndicesStart);
+
+    int bulletIndices[bulletIndicesLen];
+
+    for (int i = 0; i < bulletIndicesLen; i++) {
+        bulletIndices[i] = 1;
+    }
+
+    currIndex = 0;
+    bulletIndex.clear();
+
+    while (currIndex < bulletIndicesLen) {
+
+        if (fInStrm.good()) {
+            fInStrm.get(extractedChar);
+
+        } else {
+            error = 2;
+
+            std::cout << "Ran out of characters to read when parsing indices file(how does this happen)" << std::endl;
+
+            break;
+        }
+
+        if (extractedChar == ',' || extractedChar == 'e') {
+            bulletIndex += '\0';
+
+            bulletIndices[currIndex] = std::stoi(bulletIndex);
+            bulletIndex.clear();
+
+            currIndex++;
+        } else if (extractedChar == '\n' || extractedChar == ' ') {
+            continue;
+
+        } else {
+            bulletIndex += extractedChar;
+
+        }
+    }
+
+    bulletIndicesPtr = new unsigned int[bulletIndicesLen];
+    for (int i = 0; i < bulletIndicesLen; i++) {
+        *(bulletIndicesPtr + i) = *(bulletIndices + i);
     }
 }

@@ -2,21 +2,20 @@
 
 Character::Character() {}
 
-Character::Character(const char* characterFile, const char* vertexShaderFile, const char* fragmentShaderFile, float characterWidth, float x, float y) {
-    setup(characterFile, vertexShaderFile, fragmentShaderFile, characterWidth, x, y);
+Character::Character(const char* characterFile, const char* vertexShaderFile, const char* fragmentShaderFile, float characterWidth, Coord c) {
+    setup(characterFile, vertexShaderFile, fragmentShaderFile, characterWidth, c);
 }
 
-void Character::setup(const char* characterFile, const char* vertexShaderFile, const char* fragmentShaderFile, float characterWidth, float x, float y) {
+void Character::setup(const char* characterFile, const char* vertexShaderFile, const char* fragmentShaderFile, float characterWidth, Coord c) {
     error = 0;
 
-    xPos = x;
-    yPos = y;
+    coords = c;
 
     width = characterWidth;
 
     attributesParser.readFile(characterFile);
 
-    hitbox.setCoords(xPos, yPos);
+    hitbox.setCoords(coords);
     hitbox.setDimensions(width, width);
     hitbox.setInteractiveProperties(0, 0);
 
@@ -45,42 +44,49 @@ void Character::activateShader() {
     shader.activate();
 }
     
-void Character::draw(float windowWidth, float windowHeight, float x, float y) {
+void Character::draw(Coord c) {
     activateShader();
 
     glLineWidth(attributesParser.strokeWidth);
 
     shader.set2f("resize", width/2.0f, -width/2.0f);
     shader.set2f("dimensions", width, width);
-    shader.set2f("worldCoords", x, y);
-    shader.set2f("coords", xPos, yPos);
+    shader.set2f("worldCoords", c.x, c.y);
+    shader.set2f("coords", coords.x, coords.y);
 
     shader.draw();
 }
 
-void Character::shoot(int position) {
+Bullet Character::shoot(int position) {
     if (position < 0 || position >= attributesParser.numBulletSpawns) {
-        return;
+        return Bullet(Coord(-10, -10), 0, 0, 0, attributesParser.strokeWidth, attributesParser.bulletVerticesPtr, attributesParser.bulletVerticesLen,
+                      attributesParser.bulletIndicesPtr, attributesParser.bulletIndicesLen); // lifespan of 0 so that the bullet dies at the next update
+    }
+
+    switch (position) {
+        case 0:
+            return Bullet(coords, 640.0f, 0.0f, 5000, attributesParser.strokeWidth, attributesParser.bulletVerticesPtr, attributesParser.bulletVerticesLen,
+                          attributesParser.bulletIndicesPtr, attributesParser.bulletIndicesLen);
     }
 }
 
-void Character::setCoords(float x, float y) {
-    xPos = x;
-    yPos = y;
+void Character::setCoords(Coord c) {
+    coords = c;
 
-    hitbox.setCoords(xPos, yPos);
+    hitbox.setCoords(coords);
 }
 
-void Character::translate(float x, float y) {
-    xPos += x;
-    yPos += y;
+void Character::translate(Coord c) {
+    coords += c;
 
-    hitbox.setCoords(xPos, yPos);
+    hitbox.setCoords(coords);
 }
 
 Hitbox Character::getHitbox() {
     return hitbox;
 }
+
+
 
 void Character::set1f(const char* var, float arg1) {
     activateShader();

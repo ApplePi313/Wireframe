@@ -2,13 +2,12 @@
 
 
 Level::Level() {}
-Level::Level(float x, float y, int levelTileWidth, int levelTileHeight, const char* inVertexShaderFile, const char* inFragmentShaderFile) {
-    setup(x, y, levelTileWidth, levelTileHeight, inVertexShaderFile, inFragmentShaderFile);
+Level::Level(Coord c, int levelTileWidth, int levelTileHeight, const char* inVertexShaderFile, const char* inFragmentShaderFile) {
+    setup(c, levelTileWidth, levelTileHeight, inVertexShaderFile, inFragmentShaderFile);
 }
 
-void Level::setup(float x, float y, int levelTileWidth, int levelTileHeight, const char* inVertexShaderFile, const char* inFragmentShaderFile) {
-    xPos = x;
-    yPos = y;
+void Level::setup(Coord c, int levelTileWidth, int levelTileHeight, const char* inVertexShaderFile, const char* inFragmentShaderFile) {
+    coords = c;
 
     tileWidth = levelTileWidth;
     tileHeight = levelTileHeight;
@@ -54,7 +53,7 @@ void Level::generate() {
             rbcWidth = randGen.getPositiveInt() % 10 + 10;
             rbcHeight = randGen.getPositiveInt() % 10 + 10;
 
-            roomsPtr[i][j] = Room(xPos + 64 * 20 * j, yPos + 64 * 20 * i, rbcWidth, rbcHeight, 0, tilesPtr, hitboxesPtr, 20 * j, 20 * i);
+            roomsPtr[i][j] = Room(coords + Coord(64 * 20 * j, 64 * 20 * i), rbcWidth, rbcHeight, 0, tilesPtr, hitboxesPtr, 20 * j, 20 * i);
         }
     }
 
@@ -66,7 +65,7 @@ void Level::generate() {
                           (mini(roomsPtr[i][j].getWidth(), roomsPtr[i+1][j].getWidth()) - 4);
 
                 if (randGen.chance(50)) {
-                    Hall* tmpHall = new Hall(xPos, yPos, // just pass in the level's coords here, the tile offsets will do the rest
+                    Hall* tmpHall = new Hall(coords, // just pass in the level's coords here, the tile offsets will do the rest
                                              4, 20 - roomsPtr[i][j].getHeight() + 2, 1, 
                                              tilesPtr, hitboxesPtr, 20 * j + hallPos, 20 * i + roomsPtr[i][j].getHeight() - 1);
                     delete tmpHall;
@@ -79,7 +78,7 @@ void Level::generate() {
                           (mini(roomsPtr[i][j].getHeight(), roomsPtr[i][j+1].getHeight()) - 4);
 
                 if (randGen.chance(50)) {
-                    Hall* tmpHall = new Hall(xPos, yPos, // just pass in the level's coords here, the tile offsets will do the rest
+                    Hall* tmpHall = new Hall(coords, // just pass in the level's coords here, the tile offsets will do the rest
                                              20 - roomsPtr[i][j].getWidth() + 2, 4, 0, 
                                              tilesPtr, hitboxesPtr, 20 * j + roomsPtr[i][j].getWidth() - 1, 20 * i + hallPos);
                     delete tmpHall;
@@ -95,12 +94,12 @@ void Level::generate() {
     delete[] roomsPtr;
 }
 
-void Level::draw(float worldX, float worldY) {
+void Level::draw(Coord c) {
     shader.activate();
 
     shader.set2f("dimensions", 64.0f, 64.0f);
     shader.set2f("resize", 32, -32);
-    shader.set2f("worldCoords", worldX, worldY);
+    shader.set2f("worldCoords", c.x, c.y);
 
     for (int layer = 0; layer < 10; layer++) {
         for (int i = 0; i < tileHeight; i++) {
@@ -109,6 +108,10 @@ void Level::draw(float worldX, float worldY) {
             }
         }
     }
+}
+
+void Level::setCoords(Coord c) {
+    coords = c;
 }
 
 void Level::getHitboxes(Hitbox*** outHitboxesPtr, int* outWidth, int* outHeight) {

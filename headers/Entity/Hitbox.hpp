@@ -1,6 +1,7 @@
 #pragma once 
 
 #include <iostream>
+#include "Globals.hpp"
 
 /*
     Hitbox types:
@@ -11,9 +12,10 @@
     4: kills
 */
 
+using namespace Globals;
+
 class Hitbox {
-        float xPos = 0.0f;
-        float yPos = 0.0f;
+        Coord coords;
 
         float width = 0.0f;
         float height = 0.0f;
@@ -24,9 +26,9 @@ class Hitbox {
 
     public:
         Hitbox();
-        Hitbox(float, float, float, float); // x, y, width, height
-        Hitbox(float, float, float, float, int); // x, y, width, height, type
-        Hitbox(float, float, float, float, int, int); // x, y, width, height, types, modifier(for damage type amount of damage, more functionality to be added)
+        Hitbox(Coord, float, float); // x, y, width, height
+        Hitbox(Coord, float, float, int); // x, y, width, height, type
+        Hitbox(Coord, float, float, int, int); // x, y, width, height, types, modifier(for damage type amount of damage, more functionality to be added)
 
         float getX();
         void setX(float);
@@ -34,7 +36,7 @@ class Hitbox {
         float getY();
         void setY(float);
 
-        void setCoords(float, float);
+        void setCoords(Coord);
 
         float getWidth();
         void setWidth(float);

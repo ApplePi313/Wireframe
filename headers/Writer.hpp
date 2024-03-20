@@ -10,7 +10,9 @@
 class Writer {
     FT_Library ft;
     FT_Face face;
+    int error;
 
     public:
         Writer();
+        void write(const char*);
 };

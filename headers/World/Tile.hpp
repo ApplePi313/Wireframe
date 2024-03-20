@@ -5,6 +5,9 @@
 
 #include "Shaders/Shader.hpp"
 #include "AttributesParser.hpp"
+#include "Globals.hpp"
+
+using namespace Globals;
 
 /*
     Designs:
@@ -19,8 +22,7 @@
 */
 
 class Tile {
-    float xPos = 0.0f;
-    float yPos = 0.0f;
+    Coord coords;
 
     int size = 64; // Tile size in pixels
 
@@ -34,13 +36,13 @@ class Tile {
 
         Tile();
 
-        Tile(float, float, int);
+        Tile(Coord, int);
 
         void setDesign(int);
 
         void drawTDSet(Shader*); // Draw, tile dimensions set
         void draw(Shader*);
-        void draw(float, float, Shader*);
+        void draw(Coord, Shader*);
 
         int getLayer();
 

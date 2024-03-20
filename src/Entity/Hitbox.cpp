@@ -2,17 +2,15 @@
 
 Hitbox::Hitbox() {}
 
-Hitbox::Hitbox(float x, float y, float hitboxWidth, float hitboxHeight) {
-    xPos = x;
-    yPos = y;
+Hitbox::Hitbox(Coord c, float hitboxWidth, float hitboxHeight) {
+    coords = c;
     
     width = hitboxWidth;
     height = hitboxHeight;
 }
 
-Hitbox::Hitbox(float x, float y, float hitboxWidth, float hitboxHeight, int hitboxType) {
-    xPos = x;
-    yPos = y;
+Hitbox::Hitbox(Coord c, float hitboxWidth, float hitboxHeight, int hitboxType) {
+    coords = c;
 
     width = hitboxWidth;
     height = hitboxHeight;
@@ -20,9 +18,8 @@ Hitbox::Hitbox(float x, float y, float hitboxWidth, float hitboxHeight, int hitb
     type = hitboxType;
 }
 
-Hitbox::Hitbox(float x, float y, float hitboxWidth, float hitboxHeight, int hitboxType, int hitboxModifier) {
-    xPos = x;
-    yPos = y;
+Hitbox::Hitbox(Coord c, float hitboxWidth, float hitboxHeight, int hitboxType, int hitboxModifier) {
+    coords = c;
 
     width = hitboxWidth;
     height = hitboxHeight;
@@ -31,13 +28,13 @@ Hitbox::Hitbox(float x, float y, float hitboxWidth, float hitboxHeight, int hitb
     modifier = hitboxModifier;
 }
 
-float Hitbox::getX() {return xPos;}
-void Hitbox::setX(float x) {xPos = x;}
+float Hitbox::getX() {return coords.x;}
+void Hitbox::setX(float x) {coords.y = x;}
 
-float Hitbox::getY() {return yPos;}
-void Hitbox::setY(float y) {yPos = y;}
+float Hitbox::getY() {return coords.y;}
+void Hitbox::setY(float y) {coords.y = y;}
 
-void Hitbox::setCoords(float x, float y) {xPos = x; yPos = y;}
+void Hitbox::setCoords(Coord c) { coords = c; }
 
 float Hitbox::getWidth() {return width;}
 void Hitbox::setWidth(float w) {width = w;}
@@ -56,20 +53,20 @@ void Hitbox::setModifier(int hitboxModifier) {modifier = hitboxModifier;}
 void Hitbox::setInteractiveProperties(int hitboxType, int hitboxModifier) {type = hitboxType; modifier = hitboxModifier;}
 
 bool Hitbox::isColliding(Hitbox otherHitbox) {
-    if (xPos < otherHitbox.getX()) {
-        if (yPos < otherHitbox.getY()) {
-            return (otherHitbox.getX() - xPos <= width && otherHitbox.getY() - yPos <= height); // other hitbox is to bottom right
+    if (coords.x < otherHitbox.getX()) {
+        if (coords.y < otherHitbox.getY()) {
+            return (otherHitbox.getX() - coords.x <= width && otherHitbox.getY() - coords.y <= height); // other hitbox is to bottom right
 
         } else {
-            return (otherHitbox.getX() - xPos <= width && yPos - otherHitbox.getY() <= otherHitbox.getHeight()); // other hitbox is to top right
+            return (otherHitbox.getX() - coords.x <= width && coords.y - otherHitbox.getY() <= otherHitbox.getHeight()); // other hitbox is to top right
 
         }
     } else {
-        if (yPos < otherHitbox.getY()) {
-            return (xPos - otherHitbox.getX() <= otherHitbox.getWidth() && otherHitbox.getY() - yPos <= height); // other hitbox is to bottom left
+        if (coords.y < otherHitbox.getY()) {
+            return (coords.x - otherHitbox.getX() <= otherHitbox.getWidth() && otherHitbox.getY() - coords.y <= height); // other hitbox is to bottom left
 
         } else {
-            return (xPos - otherHitbox.getX() <= otherHitbox.getWidth() && yPos - otherHitbox.getY() <= otherHitbox.getHeight()); // other hitbox is to top left
+            return (coords.x - otherHitbox.getX() <= otherHitbox.getWidth() && coords.y - otherHitbox.getY() <= otherHitbox.getHeight()); // other hitbox is to top left
 
         }
     }

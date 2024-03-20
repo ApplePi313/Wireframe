@@ -23,8 +23,7 @@
 class Character {
     int error = 0;
 
-    float xPos = 0.0f;
-    float yPos = 0.0f;
+    Coord coords;
 
     float width = 0.0f;
 
@@ -34,28 +33,26 @@ class Character {
 
     Hitbox hitbox;
 
-    Bullet bullets[100];
-
     public: 
         Character();
-        Character(const char*, const char*, const char*, float, float, float);
+        Character(const char*, const char*, const char*, float, Coord);
             // character attribute file,  vshader, fshader, character size, xPos, yPos
-        void setup(const char*, const char*, const char*, float, float, float);
+        void setup(const char*, const char*, const char*, float, Coord);
 
         void getVertices(float**, int*);
         void getIndices(unsigned int**, int*);
 
         int getErrorCode();
 
-        void shoot(int);
+        Bullet shoot(int);
 
         // These all just call programs in the Shader class
         void activateShader();
         
-        void draw(float, float, float, float);
+        void draw(Coord);
 
-        void setCoords(float, float);
-        void translate(float, float);
+        void setCoords(Coord);
+        void translate(Coord);
 
         Hitbox getHitbox();
 

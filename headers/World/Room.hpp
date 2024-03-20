@@ -7,10 +7,12 @@
 #include "Shaders/Shader.hpp"
 #include "Rand.hpp"
 #include "Entity/Hitbox.hpp"
+#include "Globals.hpp"
+
+using namespace Globals;
 
 class Room {
-    float xPos = 0.0f;
-    float yPos = 0.0f;
+    Coord coords;
 
     int width;
     int height;
@@ -38,17 +40,17 @@ class Room {
 
     public:
         Room();
-        Room(float, float, int, int, int, const char*, const char*);
-        Room(float, float, int, int, int, Tile**, Hitbox**, int, int);
+        Room(Coord, int, int, int, const char*, const char*);
+        Room(Coord, int, int, int, Tile**, Hitbox**, int, int);
 
-        void setup(float, float, int, int, int, const char*, const char*);
-        void setup(float, float, int, int, int, Tile**, Hitbox**, int, int);
+        void setup(Coord, int, int, int, const char*, const char*);
+        void setup(Coord, int, int, int, Tile**, Hitbox**, int, int);
 
         int formEntry(int, int, int);
         int formEntry(int, int, int, Tile**, Hitbox**, int, int);
 
         void activateShader();
-        void draw(float x, float y);
+        void draw(Coord);
 
         void getHitboxes(Hitbox***, int*, int*);
         void getTiles(Tile***, int*, int*);

@@ -1,30 +1,43 @@
 #pragma once
 
 #include <iostream>
-#include <ctime>
-#include <cmath>
 
-class Bullet {
-    float xPos = 0.0f;
-    float yPos = 0.0f;
+#include "Templates/SignalReceiver.hpp"
+#include "Shaders/Shader.hpp"
+#include "Globals.hpp"
 
-    float velocity = 0.0f;
+using namespace signals;
+using namespace Globals;
+
+class Bullet : public SignalReceiver {
+    Coord coords;
+
+    float velocityMagnitude = 0.0f;
     float rotation = 0.0f;
 
+    Coord velocity;
+
+    float vX = 0.0f;
+    float vY = 0.0f;
+
     long spawnTime = 0;
-    int lifespan = 0;
+    long lastUpdateTime = 0;
+    long lifespan = 0;
 
-    bool dead = true;
+    float strokeWidth = 2.0f;
 
-    const float PI = 3.141592653589793;
+    float* vertices;
+    unsigned int* indices;
+
+    int verticesLen;
+    int indicesLen;
 
     public: 
         Bullet();
-        Bullet(float, float, float, float, int);
-        void setup(float, float, float, float, int);
-
-        void update();
+        Bullet(Coord, float, float, long, float, float*, int, unsigned int*, int); // x, y, v, rot, life
+        void setup(Coord, float, float, long, float, float*, int, unsigned int*, int);
 
         void clear();
-        bool isDead();
+        Signal signal(Signal);
+        void draw(Shader*);
 };

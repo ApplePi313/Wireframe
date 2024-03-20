@@ -5,13 +5,17 @@
 
 #include "Entity/Character.hpp"
 #include "Entity/Hitbox.hpp"
+#include "Entity/Bullet.hpp"
 
 #include "World/Room.hpp"
 #include "World/Hall.hpp"
 #include "World/Level.hpp"
 
+#include "Globals.hpp"
+
 #include "Writer.hpp"
-#include "UniversalResources.hpp"
+
+using namespace Globals;
 
 /*
     Some things to remember:
@@ -20,11 +24,10 @@
         
 */
 
-UniversalResources resources;
 Writer writer;
 
-int windowWidth = 800;
-int windowHeight = 600;
+int newWindowWidth;
+int newWindowHeight;
 
 float xPos = 0;
 float yPos = 0;
@@ -32,13 +35,17 @@ float yPos = 0;
 float xChange = 0.0f;
 float yChange = 0.0f;
 
-float speed = 0.5;
+float speed = 4.0f;
 
 Character character;
 
 // Room room;
 
 Level level;
+
+Shader bulletsShader;
+std::vector<Bullet> bullets;
+bool bulletShot;
 
 Hitbox** levelHitboxesPtr;
 int levelWidth = 81;
@@ -48,10 +55,13 @@ int levelHeight = 41;
 
 void framebuffer_size_callback(GLFWwindow*, int, int);
 void processInput(GLFWwindow*);
+void updateEntities();
 
 void checkHitboxInteractions(float*, float*);
 
 int main(void) {
+    windowWidth = 800;
+    windowHeight = 600;
 
             /*
             
@@ -67,8 +77,8 @@ int main(void) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0); // gl version x.0 (both add up to 4.0)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    resources.windowWidth = windowWidth;
-    resources.windowHeight = windowHeight;
+    // resources.windowWidth = windowWidth;
+    // resources.windowHeight = windowHeight;
     GLFWwindow* window = glfwCreateWindow(windowWidth, windowHeight, "Window", NULL, NULL);
 
     if (window == NULL) {
@@ -115,7 +125,7 @@ int main(void) {
     glLineWidth(4.0f); // Set the stroke size (max of 10)
 
 
-    character.setup("src/Assets/Characters/Player.attr", "src/Shaders/VertexShader.vert", "src/Shaders/FragmentShader.frag", 32.0f, windowWidth/2.0f - 16 + xPos, windowHeight/2.0f - 16 + yPos);
+    character.setup("src/Assets/Characters/Player.attr", "src/Shaders/VertexShader.vert", "src/Shaders/FragmentShader.frag", 32.0f, Coord(windowWidth/2.0f - 16 + xPos, windowHeight/2.0f - 16 + yPos));
 
     // hall.setup(0.0f, 576.0f, 8, 4, 0, "src/Shaders/VertexShader.vert", "src/Shaders/FragmentShader.frag");
 
@@ -125,8 +135,9 @@ int main(void) {
 
     // Room bleh = Room(0.0f, 0.0f, levelWidth, levelHeight, 0, "src/Shaders/VertexShader.vert", "src/Shaders/FragmentShader.frag");
 
-    level = Level(0.0f, 0.0f, levelWidth, levelHeight, "src/Shaders/VertexShader.vert", "src/Shaders/FragmentShader.frag");
+    level = Level(Coord(0.0f, 0.0f), levelWidth, levelHeight, "src/Shaders/VertexShader.vert", "src/Shaders/FragmentShader.frag");
 
+    bulletsShader.fileSetup("src/Shaders/VertexShader.vert", "src/Shaders/FragmentShader.frag");
             /*
             
             Main Rendering Loop
@@ -134,19 +145,18 @@ int main(void) {
             */
 
     while(!glfwWindowShouldClose(window)) {
-        glfwGetWindowSize(window, &resources.windowWidth, &resources.windowHeight); // update the screen dimensions in case of a resize
-        xPos += (windowWidth - resources.windowWidth) / 2;
-        yPos += (windowHeight - resources.windowHeight) / 2;
-        windowWidth = resources.windowWidth;
-        windowHeight = resources.windowHeight;
-
-        // check inputs
-        for (int i = 0; i < 10; i++) {
-            processInput(window);
+        glfwGetWindowSize(window, &newWindowWidth, &newWindowHeight); // update the screen dimensions in case of a resize
+        if (newWindowHeight != windowWidth || newWindowHeight != windowHeight) {
+            xPos += (windowWidth - newWindowWidth) / 2;
+            yPos += (windowHeight - newWindowHeight) / 2;
+            windowWidth = newWindowWidth;
+            windowHeight = newWindowHeight;
         }
 
+        // check inputs
+        processInput(window);
         // clear the screen
-        glClearColor(0.2f, 0.2f, 0.2f, 1.0f); // currently clears to be grey
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f); // currently clears to be grey
         glClear(GL_COLOR_BUFFER_BIT);
 
         // writer.render_text("hello", 50, 50, 24, 24);
@@ -157,10 +167,11 @@ int main(void) {
         
         */ 
 
-        level.draw(xPos, yPos);
+        level.draw(Coord(xPos, yPos));
 
-        character.draw(windowWidth, windowHeight, xPos, yPos);
+        character.draw(Coord(xPos, yPos));
 
+        updateEntities();
 
         // update the screen
         glfwSwapBuffers(window);
@@ -202,13 +213,37 @@ void processInput(GLFWwindow* window) {
         // generate hall
     }
 
+    if (xChange && yChange) {
+        xChange /= 1.414; // divide by sqrt(2)
+        yChange /= 1.414;
+    }
+
     checkHitboxInteractions(&xChange, &yChange);
 
     xPos += xChange;
     yPos += yChange;
 
-    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-        character.shoot(0);
+    if (!bulletShot && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) {
+        bullets.push_back(character.shoot(0));
+        bulletShot = true;
+        std::cout << "new bullet\n";
+    } else if (!glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) {
+        bulletShot = false;
+    }
+}
+
+void updateEntities() {
+    bulletsShader.activate();
+    bulletsShader.set2f("dimensions", 32.0f, 32.0f);
+    bulletsShader.set2f("resize", 32.0f/2.0f, -32.0f/2.0f);
+    bulletsShader.set2f("worldCoords", xPos, yPos);
+    for (int i = bullets.size() - 1; i >= 0; i--) {
+        if (bullets.at(i).signal(Signal(Update)).type == Delete) {
+            std::cout << "dead bullet\n";
+            bullets.erase(bullets.begin() + i);
+        } else {
+            bullets.at(i).draw(&bulletsShader);
+        }
     }
 }
 
@@ -220,7 +255,7 @@ void checkHitboxInteractions(float* xPtr, float* yPtr) {
 
     xPos += x;
 
-    character.translate(x, 0);
+    character.translate(Coord(x, 0));
 
     bool alreadyMovedBack = false;
 
@@ -230,7 +265,7 @@ void checkHitboxInteractions(float* xPtr, float* yPtr) {
                 if ((*(*(levelHitboxesPtr + i) + j)).isBlocking() && !alreadyMovedBack) {
                     *xPtr -= x;
 
-                    character.translate(-x, 0);
+                    character.translate(Coord(-x, 0));
 
                     alreadyMovedBack = true;
                 }
@@ -243,7 +278,7 @@ void checkHitboxInteractions(float* xPtr, float* yPtr) {
 
     yPos += y;
 
-    character.translate(0, y);
+    character.translate(Coord(0, y));
 
     alreadyMovedBack = false;
 
@@ -253,7 +288,7 @@ void checkHitboxInteractions(float* xPtr, float* yPtr) {
                 if ((*(*(levelHitboxesPtr + i) + j)).isBlocking() && !alreadyMovedBack) {
                     *yPtr -= y;
 
-                    character.translate(0, -y);
+                    character.translate(Coord(0, -y));
 
                     Hitbox tmp = character.getHitbox();
 

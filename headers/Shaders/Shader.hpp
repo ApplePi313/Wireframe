@@ -6,7 +6,9 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "UniversalResources.hpp"
+#include "Globals.hpp"
+
+using namespace Globals;
 
 /* Error Codes
     1: failed file read
@@ -27,6 +29,9 @@ class Shader {
     std::fstream fInStrm;
     int fileLength;
 
+    float* vertices;
+    unsigned int* indices;
+
     int verticesLength;
     int indicesLength;
 
@@ -34,8 +39,6 @@ class Shader {
     char infoLog[512];
 
     int error;
-
-    UniversalResources resources;
 
     public: 
 
@@ -46,8 +49,10 @@ class Shader {
     void fileSetup(const char*, const char*);
 
     void setup(const char*, const char*, float*, int, unsigned int*, int);
+    void setupDynamic(const char*, const char*, float*, int, unsigned int*, int);
 
     void setVertices(float*, int, unsigned int*, int);
+    void updateVertices(float*, int, unsigned int*, int); // verts, vlen, ind, indlen
 
     int getErrorCode();
 

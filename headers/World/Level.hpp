@@ -9,14 +9,12 @@
 #include "Entity/Hitbox.hpp"
 
 #include "Rand.hpp"
-#include "UniversalResources.hpp"
 #include "Globals.hpp"
 
 using namespace Globals;
 
 class Level {
-    float xPos = 0;
-    float yPos = 0;
+    Coord coords;
 
     int tileWidth = 0;
     int tileHeight = 0;
@@ -44,14 +42,14 @@ class Level {
 
     public:
         Level();
-        Level(float, float, int, int, const char*, const char*);
+        Level(Coord, int, int, const char*, const char*);
 
-        void setup(float, float, int, int, const char*, const char*);
+        void setup(Coord, int, int, const char*, const char*);
 
-        void draw(float, float);
+        void draw(Coord);
 
         void getHitboxes(Hitbox***, int*, int*);
 
-        void setCoords(float, float);
+        void setCoords(Coord);
         void checkHitboxInteractions(Hitbox* hitbox);
 };
