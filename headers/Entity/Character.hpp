@@ -10,8 +10,10 @@
 
 #include "Shaders/Shader.hpp"
 
+#include "Entity/Entity.hpp"
 #include "Entity/Hitbox.hpp"
 #include "Entity/Bullet.hpp"
+#include "Globals.hpp"
 
 /* Error Codes
     0: fine
@@ -20,18 +22,10 @@
     3: invalid setup of the attribute file
 */
 
-class Character {
-    int error = 0;
+using namespace Globals;
 
-    Coord coords;
-
-    float width = 0.0f;
-
-    AttributesParser attributesParser;
-
-    Shader shader;
-
-    Hitbox hitbox;
+class Character : public Entity {
+    float bulletRotation = 0.0;
 
     public: 
         Character();
@@ -44,17 +38,7 @@ class Character {
 
         int getErrorCode();
 
-        Bullet shoot(int);
-
-        // These all just call programs in the Shader class
-        void activateShader();
-        
-        void draw(Coord);
-
-        void setCoords(Coord);
-        void translate(Coord);
-
-        Hitbox getHitbox();
+        Bullet shoot(int, Coord);
 
         void set1f(const char*, float);
         void set2f(const char*, float, float);

@@ -29,35 +29,32 @@ Writer writer;
 int newWindowWidth;
 int newWindowHeight;
 
-float xPos = 0;
-float yPos = 0;
-
-float xChange = 0.0f;
-float yChange = 0.0f;
+double xPos = 0;
+double yPos = 0;
+Coord cursorPos;
+double xChange = 0.0;
+double yChange = 0.0;
 
 float speed = 4.0f;
 
 Character character;
 
-// Room room;
-
 Level level;
 
 Shader bulletsShader;
 std::vector<Bullet> bullets;
-bool bulletShot;
+bool bulletShot = true;
 
 Hitbox** levelHitboxesPtr;
 int levelWidth = 81;
 int levelHeight = 41;
 
-// Hall hall;
-
 void framebuffer_size_callback(GLFWwindow*, int, int);
+void cursor_position_callback(GLFWwindow*, double, double);
 void processInput(GLFWwindow*);
 void updateEntities();
 
-void checkHitboxInteractions(float*, float*);
+void checkHitboxInteractions(double*, double*);
 
 int main(void) {
     windowWidth = 800;
@@ -103,7 +100,8 @@ int main(void) {
 
     // For if the window is resized
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);  
-
+    
+    glfwSetCursorPosCallback(window, cursor_position_callback);
 
     // Set the window title
     glfwSetWindowTitle(window, "Wireframe");
@@ -145,14 +143,6 @@ int main(void) {
             */
 
     while(!glfwWindowShouldClose(window)) {
-        glfwGetWindowSize(window, &newWindowWidth, &newWindowHeight); // update the screen dimensions in case of a resize
-        if (newWindowHeight != windowWidth || newWindowHeight != windowHeight) {
-            xPos += (windowWidth - newWindowWidth) / 2;
-            yPos += (windowHeight - newWindowHeight) / 2;
-            windowWidth = newWindowWidth;
-            windowHeight = newWindowHeight;
-        }
-
         // check inputs
         processInput(window);
         // clear the screen
@@ -188,6 +178,15 @@ int main(void) {
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
         glViewport(0, 0, width, height);
+        if (width != windowWidth || height != windowHeight) {
+            xPos += (windowWidth - width) / 2;
+            yPos += (windowHeight - height) / 2;
+            windowWidth = width;
+            windowHeight = height;
+        }
+}
+void cursor_position_callback(GLFWwindow* window, double x, double y) {
+    cursorPos = Coord(x, y);
 }
 
 void processInput(GLFWwindow* window) {
@@ -224,7 +223,7 @@ void processInput(GLFWwindow* window) {
     yPos += yChange;
 
     if (!bulletShot && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) {
-        bullets.push_back(character.shoot(0));
+        bullets.push_back(character.shoot(0, cursorPos + Coord(xPos, yPos)));
         bulletShot = true;
         std::cout << "new bullet\n";
     } else if (!glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) {
@@ -247,13 +246,14 @@ void updateEntities() {
     }
 }
 
-void checkHitboxInteractions(float* xPtr, float* yPtr) {
-    float x = *xPtr;
-    float y = *yPtr;
+void checkHitboxInteractions(double* xPtr, double* yPtr) {
+    // level.hitboxMove(character.getHitbox(), xPtr, yPtr);
+    double x = *xPtr;
+    double y = *yPtr;
 
     level.getHitboxes(&levelHitboxesPtr, &levelWidth, &levelHeight);
 
-    xPos += x;
+    // xPos += x;
 
     character.translate(Coord(x, 0));
 
@@ -273,10 +273,10 @@ void checkHitboxInteractions(float* xPtr, float* yPtr) {
         }
     }
 
-    xPos -= x;
+    // xPos -= x;
 
 
-    yPos += y;
+    // yPos += y;
 
     character.translate(Coord(0, y));
 
@@ -302,5 +302,5 @@ void checkHitboxInteractions(float* xPtr, float* yPtr) {
         if (alreadyMovedBack) break;
     }
 
-    yPos -= y;
+    // yPos -= y;
 }

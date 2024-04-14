@@ -5,6 +5,10 @@
 #include <cmath>
 
 namespace Globals {
+    extern int windowWidth;
+    extern int windowHeight;
+    extern const float PI;
+
     struct Coord {
         float x;
         float y;
@@ -18,6 +22,24 @@ namespace Globals {
             y = yPos;
         }
 
+        float magnitude() {
+            return hypot(x, y);
+        }
+        float angle() {
+            if (x < 0) {
+                return 360 - ((atan(y / x) * 180/PI) + 90);
+            } else if (x == 0) {
+                return y > 0 ? 180 : 0;
+            } else {
+                return 90 - ((atan(y / x) * 180/PI));
+            }
+        }
+
+        void print() {
+            std::cout << "x: " << x << "\n";
+            std::cout << "y: " << y << "\n";
+        }
+
         inline Coord operator+(Coord c) {
             return {x + c.x, y + c.y};
         }
@@ -28,13 +50,13 @@ namespace Globals {
         inline Coord operator*(float v) {
             return {x * v, y * v};
         }
+        inline Coord operator/(float v) {
+            return {x / v, y / v};
+        }
         inline bool operator==(Coord c) {
             return x == c.x && y == c.y;
         }
     };
-    extern int windowWidth;
-    extern int windowHeight;
-    extern float PI;
 
     extern const long currTimeMillis();
 

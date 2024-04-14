@@ -14,7 +14,7 @@
 
 /*
  * Attribute Codes:
- *  0: parse stroke stroke stroke width
+ *  0: parse stroke width
  *  1: parse bullet spawns
  */
 

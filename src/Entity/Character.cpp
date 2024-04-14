@@ -36,54 +36,25 @@ void Character::getIndices(unsigned int** indicesOut, int* indicesLenOut) {
     *indicesLenOut = attributesParser.indicesLen;
 }
 
-int Character::getErrorCode() {
-    return error;
-}
-
-void Character::activateShader() {
-    shader.activate();
-}
-    
-void Character::draw(Coord c) {
-    activateShader();
-
-    glLineWidth(attributesParser.strokeWidth);
-
-    shader.set2f("resize", width/2.0f, -width/2.0f);
-    shader.set2f("dimensions", width, width);
-    shader.set2f("worldCoords", c.x, c.y);
-    shader.set2f("coords", coords.x, coords.y);
-
-    shader.draw();
-}
-
-Bullet Character::shoot(int position) {
+Bullet Character::shoot(int position, Coord cursorPos) {
     if (position < 0 || position >= attributesParser.numBulletSpawns) {
-        return Bullet(Coord(-10, -10), 0, 0, 0, attributesParser.strokeWidth, attributesParser.bulletVerticesPtr, attributesParser.bulletVerticesLen,
-                      attributesParser.bulletIndicesPtr, attributesParser.bulletIndicesLen); // lifespan of 0 so that the bullet dies at the next update
+        return Bullet(Coord(-10, -10), 0, Coord(), 0, 0, "src/Assets/Bullets/default.attr"); // lifespan of 0 so that the bullet dies at the next update
+    }
+
+    if (cursorPos.x < coords.x) {
+        bulletRotation = ((atan((coords.y - cursorPos.y) / (cursorPos.x - coords.x)) * 180/PI) + 90);
+        bulletRotation = 360 - bulletRotation;
+    } else if (cursorPos.x == coords.x) {
+        bulletRotation = cursorPos.y > coords.y ? 180 : 0;
+    } else {
+        bulletRotation = ((atan((coords.y - cursorPos.y) / (cursorPos.x - coords.x)) * 180/PI));
+        bulletRotation = 90 - bulletRotation;
     }
 
     switch (position) {
         case 0:
-            return Bullet(coords, 640.0f, 0.0f, 5000, attributesParser.strokeWidth, attributesParser.bulletVerticesPtr, attributesParser.bulletVerticesLen,
-                          attributesParser.bulletIndicesPtr, attributesParser.bulletIndicesLen);
+            return Bullet(coords, 640.0f, velocity, bulletRotation, 5000, "src/Assets/Bullets/default.attr");
     }
-}
-
-void Character::setCoords(Coord c) {
-    coords = c;
-
-    hitbox.setCoords(coords);
-}
-
-void Character::translate(Coord c) {
-    coords += c;
-
-    hitbox.setCoords(coords);
-}
-
-Hitbox Character::getHitbox() {
-    return hitbox;
 }
 
 

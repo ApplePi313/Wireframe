@@ -2,29 +2,24 @@
 
 Bullet::Bullet() {}
 
-Bullet::Bullet(Coord pos, float bulletVelocity, float bulletRotation, long bulletLifespan, float bulletStrokeWidth,
-               float* bulletVertices, int bulletVerticesLen, unsigned int* bulletIndices, int bulletIndicesLen) {
-    setup(pos, bulletVelocity, bulletRotation, bulletLifespan, bulletStrokeWidth, bulletVertices, bulletVerticesLen, bulletIndices, bulletIndicesLen);
+Bullet::Bullet(Coord pos, float bulletVelocity, Coord initialV, float bulletRotation, long bulletLifespan, const char* bulletsAttrFile) {
+    setup(pos, bulletVelocity, initialV, bulletRotation, bulletLifespan, bulletsAttrFile);
 }
 
-void Bullet::setup(Coord pos, float bulletVelocity, float bulletRotation, long bulletLifespan, float bulletStrokeWidth,
-                   float* bulletVertices, int bulletVerticesLen, unsigned int* bulletIndices, int bulletIndicesLen) {
+void Bullet::setup(Coord pos, float bulletVelocity, Coord initialV, float bulletRotation, long bulletLifespan, const char* bulletsAttrFile) {
     coords = pos;
+    attributesParser.readFile(bulletsAttrFile);
 
     velocityMagnitude = bulletVelocity;
     rotation = bulletRotation;
 
-    velocity.x = sin(rotation) * velocityMagnitude;
-    velocity.y = -cos(rotation) * velocityMagnitude;
+    velocity.x = sin(rotation * PI/180) * velocityMagnitude;
+    velocity.y = -cos(rotation * PI/180) * velocityMagnitude;
+
+    velocity += initialV;
+    // initialV.print();
 
     lifespan = bulletLifespan;
-
-    strokeWidth = bulletStrokeWidth;
-
-    vertices = bulletVertices;
-    verticesLen = bulletVerticesLen;
-    indices = bulletIndices;
-    indicesLen = bulletIndicesLen;
 
     spawnTime = currTimeMillis();
     lastUpdateTime = spawnTime;
@@ -56,9 +51,10 @@ Signal Bullet::signal(Signal signal) {
 }
 
 void Bullet::draw(Shader* shader) {
-    glLineWidth(strokeWidth);
+    glLineWidth(attributesParser.strokeWidth);
 
-    (*shader).updateVertices(vertices, verticesLen, indices, indicesLen);
+    (*shader).updateVertices(attributesParser.verticesPtr, attributesParser.verticesLen, 
+                             attributesParser.indicesPtr, attributesParser.indicesLen);
     (*shader).set2f("coords", coords.x, coords.y);
     (*shader).draw();
 }

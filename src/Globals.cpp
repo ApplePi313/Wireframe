@@ -4,7 +4,7 @@ using namespace Globals;
 
 int Globals::windowWidth = 0;
 int Globals::windowHeight = 0;
-const float PI = 3.141592653589793;
+const float Globals::PI = 3.141592653589793;
 
 const long Globals::currTimeMillis() {
     return std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()).time_since_epoch().count();
