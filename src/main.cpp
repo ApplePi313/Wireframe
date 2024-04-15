@@ -32,10 +32,10 @@ int newWindowHeight;
 double xPos = 0;
 double yPos = 0;
 Coord cursorPos;
-double xChange = 0.0;
-double yChange = 0.0;
+int xChange = 0.0;
+int yChange = 0.0;
 
-float speed = 4.0f;
+int speed = 4;
 
 Character character;
 
@@ -54,7 +54,7 @@ void cursor_position_callback(GLFWwindow*, double, double);
 void processInput(GLFWwindow*);
 void updateEntities();
 
-void checkHitboxInteractions(double*, double*);
+void checkHitboxInteractions(int*, int*);
 
 int main(void) {
     windowWidth = 800;
@@ -134,15 +134,14 @@ int main(void) {
     // Room bleh = Room(0.0f, 0.0f, levelWidth, levelHeight, 0, "src/Shaders/VertexShader.vert", "src/Shaders/FragmentShader.frag");
 
     level = Level(Coord(0.0f, 0.0f), levelWidth, levelHeight, "src/Shaders/VertexShader.vert", "src/Shaders/FragmentShader.frag");
-
+    level.setCharacter(character);
     bulletsShader.fileSetup("src/Shaders/VertexShader.vert", "src/Shaders/FragmentShader.frag");
             /*
             
             Main Rendering Loop
             
             */
-
-    while(!glfwWindowShouldClose(window)) {
+    while (!glfwWindowShouldClose(window)) {
         // check inputs
         processInput(window);
         // clear the screen
@@ -159,7 +158,7 @@ int main(void) {
 
         level.draw(Coord(xPos, yPos));
 
-        character.draw(Coord(xPos, yPos));
+        // character.draw(Coord(xPos, yPos));
 
         updateEntities();
 
@@ -190,8 +189,8 @@ void cursor_position_callback(GLFWwindow* window, double x, double y) {
 }
 
 void processInput(GLFWwindow* window) {
-    xChange = 0.0f;
-    yChange = 0.0f;
+    xChange = 0;
+    yChange = 0;
 
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
@@ -246,61 +245,61 @@ void updateEntities() {
     }
 }
 
-void checkHitboxInteractions(double* xPtr, double* yPtr) {
-    // level.hitboxMove(character.getHitbox(), xPtr, yPtr);
-    double x = *xPtr;
-    double y = *yPtr;
+void checkHitboxInteractions(int* xPtr, int* yPtr) {
+    level.moveCharacter(xPtr, yPtr);
+    // double x = *xPtr;
+    // double y = *yPtr;
 
-    level.getHitboxes(&levelHitboxesPtr, &levelWidth, &levelHeight);
+    // level.getHitboxes(&levelHitboxesPtr, &levelWidth, &levelHeight);
 
-    // xPos += x;
+    // // xPos += x;
 
-    character.translate(Coord(x, 0));
+    // character.translate(Coord(x, 0));
 
-    bool alreadyMovedBack = false;
+    // bool alreadyMovedBack = false;
 
-    for (int i = 0; i < levelHeight; i++) {
-        for (int j = 0; j < levelWidth; j++) {
-            if (character.getHitbox().isColliding(*(*(levelHitboxesPtr + i) + j))) {
-                if ((*(*(levelHitboxesPtr + i) + j)).isBlocking() && !alreadyMovedBack) {
-                    *xPtr -= x;
+    // for (int i = 0; i < levelHeight; i++) {
+    //     for (int j = 0; j < levelWidth; j++) {
+    //         if (character.getHitbox().isColliding(*(*(levelHitboxesPtr + i) + j))) {
+    //             if ((*(*(levelHitboxesPtr + i) + j)).isBlocking() && !alreadyMovedBack) {
+    //                 *xPtr -= x;
 
-                    character.translate(Coord(-x, 0));
+    //                 character.translate(Coord(-x, 0));
 
-                    alreadyMovedBack = true;
-                }
-            }
-        }
-    }
+    //                 alreadyMovedBack = true;
+    //             }
+    //         }
+    //     }
+    // }move
 
-    // xPos -= x;
+    // // xPos -= x;
 
 
-    // yPos += y;
+    // // yPos += y;
 
-    character.translate(Coord(0, y));
+    // character.translate(Coord(0, y));
 
-    alreadyMovedBack = false;
+    // alreadyMovedBack = false;
 
-    for (int i = 0; i < levelHeight; i++) {
-        for (int j = 0; j < levelWidth; j++) {
-            if (character.getHitbox().isColliding(*(*(levelHitboxesPtr + i) + j))) {
-                if ((*(*(levelHitboxesPtr + i) + j)).isBlocking() && !alreadyMovedBack) {
-                    *yPtr -= y;
+    // for (int i = 0; i < levelHeight; i++) {
+    //     for (int j = 0; j < levelWidth; j++) {
+    //         if (character.getHitbox().isColliding(*(*(levelHitboxesPtr + i) + j))) {
+    //             if ((*(*(levelHitboxesPtr + i) + j)).isBlocking() && !alreadyMovedBack) {
+    //                 *yPtr -= y;
 
-                    character.translate(Coord(0, -y));
+    //                 character.translate(Coord(0, -y));
 
-                    Hitbox tmp = character.getHitbox();
+    //                 Hitbox tmp = character.getHitbox();
 
-                    alreadyMovedBack = true;
+    //                 alreadyMovedBack = true;
 
-                    break;
-                }
-            }
-        }
+    //                 break;
+    //             }
+    //         }
+    //     }
 
-        if (alreadyMovedBack) break;
-    }
+    //     if (alreadyMovedBack) break;
+    // }
 
     // yPos -= y;
 }

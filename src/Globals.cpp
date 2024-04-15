@@ -4,6 +4,8 @@ using namespace Globals;
 
 int Globals::windowWidth = 0;
 int Globals::windowHeight = 0;
+std::fstream Globals::attrFInStrm;
+std::fstream Globals::shaderFInStrm;
 const float Globals::PI = 3.141592653589793;
 
 const long Globals::currTimeMillis() {

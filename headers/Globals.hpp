@@ -1,23 +1,26 @@
 #pragma once
 
 #include <iostream>
+#include <fstream>
 #include <chrono>
 #include <cmath>
 
 namespace Globals {
     extern int windowWidth;
     extern int windowHeight;
+    extern std::fstream attrFInStrm;
+    extern std::fstream shaderFInStrm;
     extern const float PI;
 
     struct Coord {
-        float x;
-        float y;
+        int x;
+        int y;
 
         Coord() {
-            x = 0.0;
-            y = 0.0;
+            x = 0;
+            y = 0;
         }
-        Coord(float xPos, float yPos) {
+        Coord(int xPos, int yPos) {
             x = xPos;
             y = yPos;
         }
@@ -43,15 +46,18 @@ namespace Globals {
         inline Coord operator+(Coord c) {
             return {x + c.x, y + c.y};
         }
+        inline Coord operator-(Coord c) {
+            return {x - c.x, y - c.y};
+        }
         inline void operator+=(Coord c) {
             x += c.x;
             y += c.y;
         }
         inline Coord operator*(float v) {
-            return {x * v, y * v};
+            return {(int) (x * v), (int) (y * v)};
         }
         inline Coord operator/(float v) {
-            return {x / v, y / v};
+            return {(int) (x / v), (int) (y / v)};
         }
         inline bool operator==(Coord c) {
             return x == c.x && y == c.y;

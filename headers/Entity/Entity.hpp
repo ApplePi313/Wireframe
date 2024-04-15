@@ -24,12 +24,14 @@ class Entity : public SignalReceiver {
         Coord velocity;
 
     public:
+        Entity();
         int getErrorCode();
 
         void activateShader();
         void draw(Coord);
 
         void setCoords(Coord);
+        Coord getCoords();
         void translate(Coord);
 
         Hitbox getHitbox();

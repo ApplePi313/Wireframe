@@ -108,6 +108,12 @@ void Level::draw(Coord c) {
             }
         }
     }
+
+    character.draw(c);
+}
+
+void Level::setCharacter(Character newCharacter) {
+    character = newCharacter;
 }
 
 void Level::setCoords(Coord c) {
@@ -118,4 +124,87 @@ void Level::getHitboxes(Hitbox*** outHitboxesPtr, int* outWidth, int* outHeight)
     *outHitboxesPtr = hitboxesPtr;
     *outWidth = tileWidth;
     *outHeight = tileHeight;
+}
+
+void Level::moveCharacter(int* xChange, int* yChange) {
+    // if the character is outside of the level, don't block movement
+    if (character.getCoords().x < coords.x || character.getCoords().x > coords.x + tileWidth * 64 ||
+        character.getCoords().y < coords.y || character.getCoords().y > coords.y + tileHeight * 64) {
+
+        std::cout << "character out of level bounds\n";
+
+        character.translate(Coord(*xChange, *yChange));
+        return;
+    }
+
+    Hitbox tmpHitbox = character.getHitbox();
+
+    if (*xChange > 0) {
+        for (int i = 0; i < *xChange; i++) {
+            tmpHitbox.translate(Coord(1, 0));
+            
+            for (int j = 0; j <= ((tmpHitbox.getY()%64 + tmpHitbox.getHeight()) / 64); j++) {
+                for (int k = 0; k <= ((tmpHitbox.getX()%64 + tmpHitbox.getWidth()) / 64); k++) {
+                    if (hitboxesPtr[j + (tmpHitbox.getY() - coords.y)/64][k + (tmpHitbox.getX() - coords.x)/64].isBlocking() && 
+                        !hitboxesPtr[j + (tmpHitbox.getY() - coords.y)/64][k + (tmpHitbox.getX() - coords.x)/64]
+                            .isColliding(character.getHitbox())) {
+
+                        tmpHitbox.translate(Coord(-1, 0));
+                    }
+                }
+            }
+        }
+    } else {
+        for (int i = 0; i > *xChange; i--) {
+            tmpHitbox.translate(Coord(-1, 0));
+            
+            for (int j = 0; j <= ((tmpHitbox.getY()%64 + tmpHitbox.getHeight()) / 64); j++) {
+                for (int k = 0; k <= ((tmpHitbox.getX()%64 + tmpHitbox.getWidth()) / 64); k++) {
+                    if (hitboxesPtr[j + (tmpHitbox.getY() - coords.y)/64][k + (tmpHitbox.getX() - coords.x)/64].isBlocking() && 
+                        !hitboxesPtr[j + (tmpHitbox.getY() - coords.y)/64][k + (tmpHitbox.getX() - coords.x)/64]
+                            .isColliding(character.getHitbox())) {
+
+                        tmpHitbox.translate(Coord(1, 0));
+                    }
+                }
+            }
+        }
+    }
+
+    if (*yChange > 0) {
+        for (int i = 0; i < *yChange; i++) {
+            tmpHitbox.translate(Coord(0, 1));
+            
+            for (int j = 0; j <= ((tmpHitbox.getY()%64 + tmpHitbox.getHeight()) / 64); j++) {
+                for (int k = 0; k <= ((tmpHitbox.getX()%64 + tmpHitbox.getWidth()) / 64); k++) {
+                    if (hitboxesPtr[j + (tmpHitbox.getY() - coords.y)/64][k + (tmpHitbox.getX() - coords.x)/64].isBlocking() && 
+                        !hitboxesPtr[j + (tmpHitbox.getY() - coords.y)/64][k + (tmpHitbox.getX() - coords.x)/64]
+                            .isColliding(character.getHitbox())) {
+
+                        tmpHitbox.translate(Coord(0, -1));
+                    }
+                }
+            }
+        }
+    } else {
+        for (int i = 0; i > *yChange; i--) {
+            tmpHitbox.translate(Coord(0, -1));
+            
+            for (int j = 0; j <= ((tmpHitbox.getY()%64 + tmpHitbox.getHeight()) / 64); j++) {
+                for (int k = 0; k <= ((tmpHitbox.getX()%64 + tmpHitbox.getWidth()) / 64); k++) {
+                    if (hitboxesPtr[j + (tmpHitbox.getY() - coords.y)/64][k + (tmpHitbox.getX() - coords.x)/64].isBlocking() && 
+                        !hitboxesPtr[j + (tmpHitbox.getY() - coords.y)/64][k + (tmpHitbox.getX() - coords.x)/64]
+                            .isColliding(character.getHitbox())) {
+
+                        tmpHitbox.translate(Coord(0, 1));
+                    }
+                }
+            }
+        }
+    }
+
+
+    *xChange = (tmpHitbox.getCoords() - character.getCoords()).x;
+    *yChange = (tmpHitbox.getCoords() - character.getCoords()).y;
+    character.translate(Coord(*xChange, *yChange));
 }

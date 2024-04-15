@@ -25,8 +25,7 @@ class Shader {
     unsigned int fragmentShader;
 
     unsigned int shaderProgram;
-
-    std::fstream fInStrm;
+    
     int fileLength;
 
     float* vertices;

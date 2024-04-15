@@ -5,6 +5,8 @@
 #include <string>
 #include <cstring>
 
+#include "Globals.hpp"
+
 /* Error Codes
     0: fine
     1: failed file read
@@ -18,10 +20,10 @@
  *  1: parse bullet spawns
  */
 
+using namespace Globals;
+
 class AttributesParser {
-
-
-    std::fstream fInStrm;
+    std::fstream *fInStrm;
     int fileLength = 0;
     char extractedChar = 0;
     char* extractedChars;
@@ -42,7 +44,6 @@ class AttributesParser {
     std::string attribute;
     std::string bulletVertex;
     std::string bulletIndex;
-
 
     void parseAttributes();
     void parseVertices();

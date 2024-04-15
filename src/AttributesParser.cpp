@@ -7,9 +7,10 @@ AttributesParser::AttributesParser(const char* inFile) {
 }
 
 void AttributesParser::readFile(const char* inFile) {
-    fInStrm.open(inFile, std::ios_base::in);
+    fInStrm = &attrFInStrm;
+    fInStrm->open(inFile, std::ios_base::in);
 
-    if (!fInStrm.is_open()) {
+    if (!fInStrm->is_open()) {
 
         std::cout << "Failed to open file: " << inFile << std::endl;
 
@@ -36,7 +37,7 @@ void AttributesParser::readFile(const char* inFile) {
         }
     }
 
-    fInStrm.close();
+    fInStrm->close();
 }
 
 void AttributesParser::parseAttributes() {
@@ -46,19 +47,19 @@ void AttributesParser::parseAttributes() {
 
             */
 
-    fInStrm.seekg(0);
+    fInStrm->seekg(0);
 
-    while(fInStrm.get(extractedChar)) { // find start of attributes
+    while(fInStrm->get(extractedChar)) { // find start of attributes
         if (extractedChar == 'a') {
             break;
         }
     }
 
-    attributesStart = fInStrm.tellg();
+    attributesStart = fInStrm->tellg();
 
     attributesLen = 0;
 
-    while(fInStrm.get(extractedChar)) { // find end and determine the length
+    while(fInStrm->get(extractedChar)) { // find end and determine the length
 
         if (extractedChar == 'e') {
             attributesLen++; // adds one to the vertex count because there isn't a comma after the last one
@@ -71,7 +72,7 @@ void AttributesParser::parseAttributes() {
     }
 
     // Start parsing attributes
-    fInStrm.seekg(attributesStart);
+    fInStrm->seekg(attributesStart);
 
     int attributes[attributesLen];
 
@@ -85,8 +86,8 @@ void AttributesParser::parseAttributes() {
 
     while (currIndex != attributesLen) {
 
-        if (fInStrm.good()) {
-            fInStrm.get(extractedChar);
+        if (fInStrm->good()) {
+            fInStrm->get(extractedChar);
 
         } else {
             error = 2;
@@ -127,17 +128,17 @@ void AttributesParser::parseVertices() {
 
             */
 
-    fInStrm.seekg(0);
-    while(fInStrm.get(extractedChar)) { // find start of vertices
+    fInStrm->seekg(0);
+    while(fInStrm->get(extractedChar)) { // find start of vertices
         if (extractedChar == 'v') {
             break;
         }
     }
 
-    verticesStart = fInStrm.tellg();
+    verticesStart = fInStrm->tellg();
     verticesLen = 0;
 
-    while(fInStrm.get(extractedChar)) { // find end and determine the length
+    while(fInStrm->get(extractedChar)) { // find end and determine the length
 
         if (extractedChar == 'e') {
             verticesLen++; // adds one to the vertex count because there isn't a comma after the last one
@@ -150,7 +151,7 @@ void AttributesParser::parseVertices() {
     }
 
     // Start parsing vertices
-    fInStrm.seekg(verticesStart);
+    fInStrm->seekg(verticesStart);
 
     float vertices[verticesLen];
 
@@ -164,7 +165,7 @@ void AttributesParser::parseVertices() {
 
     while (currIndex != verticesLen) {
 
-        if (fInStrm.get(extractedChar)) {
+        if (fInStrm->get(extractedChar)) {
             if (extractedChar == ',' || extractedChar == 'e') {
             vertex += '\0';
 
@@ -205,19 +206,19 @@ void AttributesParser::parseIndices() {
 
             */
 
-    fInStrm.seekg(0);
+    fInStrm->seekg(0);
 
-    while(fInStrm.get(extractedChar)) { // find start of indices
+    while(fInStrm->get(extractedChar)) { // find start of indices
         if (extractedChar == 'i') {
             break;
         }
     }
 
-    indicesStart = fInStrm.tellg();
+    indicesStart = fInStrm->tellg();
 
     indicesLen = 0;
 
-    while(fInStrm.get(extractedChar)) { // find end and determine the length
+    while(fInStrm->get(extractedChar)) { // find end and determine the length
 
         if (extractedChar == 'e') {
             indicesLen++; // adds one to the vertex count because there isn't a comma after the last one
@@ -230,7 +231,7 @@ void AttributesParser::parseIndices() {
     }
 
     // Start parsing indices
-    fInStrm.seekg(indicesStart);
+    fInStrm->seekg(indicesStart);
 
     int indices[indicesLen];
 
@@ -244,8 +245,8 @@ void AttributesParser::parseIndices() {
 
     while (currIndex != indicesLen) {
 
-        if (fInStrm.good()) {
-            fInStrm.get(extractedChar);
+        if (fInStrm->good()) {
+            fInStrm->get(extractedChar);
 
         } else {
             error = 2;
@@ -286,31 +287,31 @@ void AttributesParser::parseStroke() {
 
             */
 
-    fInStrm.seekg(0);
+    fInStrm->seekg(0);
 
-    while(fInStrm.get(extractedChar)) { // find start of stroke
+    while(fInStrm->get(extractedChar)) { // find start of stroke
         if (extractedChar == 's') {
             break;
         }
     }
 
-    strokeStart = fInStrm.tellg();
+    strokeStart = fInStrm->tellg();
 
-    while(fInStrm.get(extractedChar)) { // find end and determine the length
+    while(fInStrm->get(extractedChar)) { // find end and determine the length
         if (extractedChar == 'e') {
             break;
         }
     }
 
     // Start parsing stroke
-    fInStrm.seekg(strokeStart);
+    fInStrm->seekg(strokeStart);
 
     vertex.clear();
 
     currIndex = 0;
 
     while (currIndex == 0) {
-        if (fInStrm.get(extractedChar)) {
+        if (fInStrm->get(extractedChar)) {
             if (extractedChar == ',' || extractedChar == 'e') {
             vertex += '\0';
 
@@ -345,19 +346,19 @@ void AttributesParser::parseBulletSpawns() {
 
             */
 
-    fInStrm.seekg(0);
+    fInStrm->seekg(0);
 
-    while(fInStrm.get(extractedChar)) { // find start of vertices
+    while(fInStrm->get(extractedChar)) { // find start of vertices
         if (extractedChar == 'b') {
             break;
         }
     }
 
-    bulletSpawnsStart = fInStrm.tellg();
+    bulletSpawnsStart = fInStrm->tellg();
 
     bulletSpawnsLen = 0;
 
-    while(fInStrm.get(extractedChar)) { // find end and determine the length
+    while(fInStrm->get(extractedChar)) { // find end and determine the length
 
         if (extractedChar == 'e') {
             bulletSpawnsLen++; // adds one to the vertex count because there isn't a comma after the last one
@@ -370,7 +371,7 @@ void AttributesParser::parseBulletSpawns() {
     }
 
     // Start parsing vertices
-    fInStrm.seekg(bulletSpawnsStart);
+    fInStrm->seekg(bulletSpawnsStart);
 
     if (bulletSpawnsLen % 2 != 0) {
         std::cout << "Invalid number of bullet spawn vertices(you have an odd amount)" << std::endl;
@@ -392,7 +393,7 @@ void AttributesParser::parseBulletSpawns() {
 
     while (currIndex != bulletSpawnsLen) {
 
-        if (fInStrm.get(extractedChar)) {
+        if (fInStrm->get(extractedChar)) {
             if (extractedChar == ',' || extractedChar == 'e') {
             bulletSpawn += '\0';
 
@@ -434,11 +435,11 @@ void AttributesParser::parseBulletVertices() {
 
             */
     extractedChars = new char[100];
-    fInStrm.seekg(0);
-    while(fInStrm.getline(extractedChars, 100, '\n')) { // find start of vertices
-        // fInStrm.seekg(fInStrm.tellg() + 1);
+    fInStrm->seekg(0);
+    while(fInStrm->getline(extractedChars, 100, '\n')) { // find start of vertices
+        // fInStrm->seekg(fInStrm->tellg() + 1);
         if (!strcmp(extractedChars, "bv")) {
-            // if (fInStrm.get(extractedChars, 2)) {
+            // if (fInStrm->get(extractedChars, 2)) {
             //     if (extractedChars[0] >= 48 && extractedChars[0] < 58) {
             //         std::cout << "cool" << std::endl;
             //     }
@@ -451,10 +452,10 @@ void AttributesParser::parseBulletVertices() {
     }
     delete[] extractedChars;
 
-    bulletVerticesStart = fInStrm.tellg();
+    bulletVerticesStart = fInStrm->tellg();
     bulletVerticesLen = 0;
     
-    while(fInStrm.get(extractedChar)) { // find end and determine the length
+    while(fInStrm->get(extractedChar)) { // find end and determine the length
         if (extractedChar == 'e') {
             bulletVerticesLen++; // adds one to the vertex count because there isn't a comma after the last one
             break;
@@ -466,7 +467,7 @@ void AttributesParser::parseBulletVertices() {
     }
 
     // Start parsing vertices
-    fInStrm.seekg(bulletVerticesStart);
+    fInStrm->seekg(bulletVerticesStart);
 
     float bulletVertices[bulletVerticesLen];
 
@@ -479,7 +480,7 @@ void AttributesParser::parseBulletVertices() {
     bulletVertex.clear();
 
     while (currIndex < bulletVerticesLen) {
-        if (fInStrm.get(extractedChar)) {
+        if (fInStrm->get(extractedChar)) {
             if (extractedChar == ',' || extractedChar == 'e') {
                 bulletVertex += '\0';
 
@@ -518,10 +519,10 @@ void AttributesParser::parseBulletIndices() {
 
             */
 
-    fInStrm.seekg(0);
+    fInStrm->seekg(0);
 
     extractedChars = new char[100];
-    while(fInStrm.getline(extractedChars, 100, '\n')) { // find start of indices
+    while(fInStrm->getline(extractedChars, 100, '\n')) { // find start of indices
         if (!strcmp(extractedChars, "bi")) {
            
             break;
@@ -529,11 +530,11 @@ void AttributesParser::parseBulletIndices() {
     }
     delete[] extractedChars;
 
-    bulletIndicesStart = fInStrm.tellg();
+    bulletIndicesStart = fInStrm->tellg();
 
     bulletIndicesLen = 0;
 
-    while(fInStrm.get(extractedChar)) { // find end and determine the length
+    while(fInStrm->get(extractedChar)) { // find end and determine the length
 
         if (extractedChar == 'e') {
             bulletIndicesLen++; // adds one to the vertex count because there isn't a comma after the last one
@@ -546,7 +547,7 @@ void AttributesParser::parseBulletIndices() {
     }
 
     // Start parsing indices
-    fInStrm.seekg(bulletIndicesStart);
+    fInStrm->seekg(bulletIndicesStart);
 
     int bulletIndices[bulletIndicesLen];
 
@@ -559,8 +560,8 @@ void AttributesParser::parseBulletIndices() {
 
     while (currIndex < bulletIndicesLen) {
 
-        if (fInStrm.good()) {
-            fInStrm.get(extractedChar);
+        if (fInStrm->good()) {
+            fInStrm->get(extractedChar);
 
         } else {
             error = 2;

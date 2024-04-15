@@ -17,8 +17,8 @@ using namespace Globals;
 class Hitbox {
         Coord coords;
 
-        float width = 0.0f;
-        float height = 0.0f;
+        int width = 0;
+        int height = 0;
 
         int type = 0;
 
@@ -26,25 +26,27 @@ class Hitbox {
 
     public:
         Hitbox();
-        Hitbox(Coord, float, float); // x, y, width, height
-        Hitbox(Coord, float, float, int); // x, y, width, height, type
-        Hitbox(Coord, float, float, int, int); // x, y, width, height, types, modifier(for damage type amount of damage, more functionality to be added)
+        Hitbox(Coord, int, int); // x, y, width, height
+        Hitbox(Coord, int, int, int); // x, y, width, height, type
+        Hitbox(Coord, int, int, int, int); // x, y, width, height, types, modifier(for damage type amount of damage, more functionality to be added)
 
-        float getX();
-        void setX(float);
+        int getX();
+        void setX(int);
 
-        float getY();
-        void setY(float);
+        int getY();
+        void setY(int);
 
         void setCoords(Coord);
+        Coord getCoords();
+        void translate(Coord);
 
-        float getWidth();
-        void setWidth(float);
+        int getWidth();
+        void setWidth(int);
 
-        float getHeight();
-        void setHeight(float);
+        int getHeight();
+        void setHeight(int);
 
-        void setDimensions(float, float);
+        void setDimensions(int, int);
 
         int getType();
         void setType(int);

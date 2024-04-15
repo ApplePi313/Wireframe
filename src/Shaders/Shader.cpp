@@ -52,25 +52,25 @@ void Shader::setup(const char* vertexShaderFile, const char* fragmentShaderFile,
             */
 
     // Read the vertex shader file
-    fInStrm.open(vertexShaderFile, std::ios_base::in);
-    if (!fInStrm.is_open()) {
+    shaderFInStrm.open(vertexShaderFile, std::ios_base::in);
+    if (!shaderFInStrm.is_open()) {
         std::cout << "Failed to open vertex shader file: " << vertexShaderFile << std::endl;
 
         error = 1;
     }
 
-    fInStrm.seekg(0, std::ios_base::end);
-    fileLength = fInStrm.tellg();
+    shaderFInStrm.seekg(0, std::ios_base::end);
+    fileLength = shaderFInStrm.tellg();
 
     char* vertexShaderSrc = new char[fileLength + 1];
 
-    fInStrm.seekg(0);
+    shaderFInStrm.seekg(0);
 
-    fInStrm.read(vertexShaderSrc, fileLength);
+    shaderFInStrm.read(vertexShaderSrc, fileLength);
 
     *(vertexShaderSrc + fileLength) = '\0'; // add a null character, because for whatever reason read() doesn't add one
 
-    fInStrm.close();
+    shaderFInStrm.close();
 
     // // Make and compile the shader
     vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -97,25 +97,25 @@ void Shader::setup(const char* vertexShaderFile, const char* fragmentShaderFile,
             */
 
     // Read the fragment shader file
-    fInStrm.open(fragmentShaderFile, std::ios_base::in);
-    if (!fInStrm.is_open()) {
+    shaderFInStrm.open(fragmentShaderFile, std::ios_base::in);
+    if (!shaderFInStrm.is_open()) {
         std::cout << "Failed to open fragment shader file: " << fragmentShaderFile << std::endl;
 
         error = 1;
     }
 
-    fInStrm.seekg(0, std::ios_base::end);
-    fileLength = fInStrm.tellg();
+    shaderFInStrm.seekg(0, std::ios_base::end);
+    fileLength = shaderFInStrm.tellg();
 
     char* fragmentShaderSrc = new char[fileLength + 1];
 
-    fInStrm.seekg(0);
+    shaderFInStrm.seekg(0);
 
-    fInStrm.read(fragmentShaderSrc, fileLength);
+    shaderFInStrm.read(fragmentShaderSrc, fileLength);
 
     *(fragmentShaderSrc + fileLength) = '\0'; // add a null character, because for whatever reason read() doesn't add one
 
-    fInStrm.close();
+    shaderFInStrm.close();
     // Make and compile the shader
     fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragmentShader, 1, (const char* const*) &fragmentShaderSrc, NULL);
@@ -207,25 +207,25 @@ void Shader::setupDynamic(const char* vertexShaderFile, const char* fragmentShad
             */
 
     // Read the vertex shader file
-    fInStrm.open(vertexShaderFile, std::ios_base::in);
-    if (!fInStrm.is_open()) {
+    shaderFInStrm.open(vertexShaderFile, std::ios_base::in);
+    if (!shaderFInStrm.is_open()) {
         std::cout << "Failed to open vertex shader file: " << vertexShaderFile << std::endl;
 
         error = 1;
     }
 
-    fInStrm.seekg(0, std::ios_base::end);
-    fileLength = fInStrm.tellg();
+    shaderFInStrm.seekg(0, std::ios_base::end);
+    fileLength = shaderFInStrm.tellg();
 
     char* vertexShaderSrc = new char[fileLength + 1];
 
-    fInStrm.seekg(0);
+    shaderFInStrm.seekg(0);
 
-    fInStrm.read(vertexShaderSrc, fileLength);
+    shaderFInStrm.read(vertexShaderSrc, fileLength);
 
     *(vertexShaderSrc + fileLength) = '\0'; // add a null character, because for whatever reason read() doesn't add one
 
-    fInStrm.close();
+    shaderFInStrm.close();
 
     // // Make and compile the shader
     vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -252,25 +252,25 @@ void Shader::setupDynamic(const char* vertexShaderFile, const char* fragmentShad
             */
 
     // Read the fragment shader file
-    fInStrm.open(fragmentShaderFile, std::ios_base::in);
-    if (!fInStrm.is_open()) {
+    shaderFInStrm.open(fragmentShaderFile, std::ios_base::in);
+    if (!shaderFInStrm.is_open()) {
         std::cout << "Failed to open fragment shader file: " << fragmentShaderFile << std::endl;
 
         error = 1;
     }
 
-    fInStrm.seekg(0, std::ios_base::end);
-    fileLength = fInStrm.tellg();
+    shaderFInStrm.seekg(0, std::ios_base::end);
+    fileLength = shaderFInStrm.tellg();
 
     char* fragmentShaderSrc = new char[fileLength + 1];
 
-    fInStrm.seekg(0);
+    shaderFInStrm.seekg(0);
 
-    fInStrm.read(fragmentShaderSrc, fileLength);
+    shaderFInStrm.read(fragmentShaderSrc, fileLength);
 
     *(fragmentShaderSrc + fileLength) = '\0'; // add a null character, because for whatever reason read() doesn't add one
 
-    fInStrm.close();
+    shaderFInStrm.close();
     // Make and compile the shader
     fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragmentShader, 1, (const char* const*) &fragmentShaderSrc, NULL);
@@ -356,25 +356,25 @@ void Shader::fileSetup(const char* vertexShaderFile, const char* fragmentShaderF
             */
 
     // Read the vertex shader file
-    fInStrm.open(vertexShaderFile, std::ios_base::in);
-    if (!fInStrm.is_open()) {
+    shaderFInStrm.open(vertexShaderFile, std::ios_base::in);
+    if (!shaderFInStrm.is_open()) {
         std::cout << "Failed to open vertex shader file: " << vertexShaderFile << std::endl;
 
         error = 1;
     }
 
-    fInStrm.seekg(0, std::ios_base::end);
-    fileLength = fInStrm.tellg();
+    shaderFInStrm.seekg(0, std::ios_base::end);
+    fileLength = shaderFInStrm.tellg();
 
     char* vertexShaderSrc = new char[fileLength + 1];
 
-    fInStrm.seekg(0);
+    shaderFInStrm.seekg(0);
 
-    fInStrm.read(vertexShaderSrc, fileLength);
+    shaderFInStrm.read(vertexShaderSrc, fileLength);
 
     *(vertexShaderSrc + fileLength) = '\0'; // add a null character, because for whatever reason read() doesn't add one
 
-    fInStrm.close();
+    shaderFInStrm.close();
 
     // // Make and compile the shader
     vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -401,25 +401,25 @@ void Shader::fileSetup(const char* vertexShaderFile, const char* fragmentShaderF
             */
 
     // Read the fragment shader file
-    fInStrm.open(fragmentShaderFile, std::ios_base::in);
-    if (!fInStrm.is_open()) {
+    shaderFInStrm.open(fragmentShaderFile, std::ios_base::in);
+    if (!shaderFInStrm.is_open()) {
         std::cout << "Failed to open fragment shader file: " << fragmentShaderFile << std::endl;
 
         error = 1;
     }
 
-    fInStrm.seekg(0, std::ios_base::end);
-    fileLength = fInStrm.tellg();
+    shaderFInStrm.seekg(0, std::ios_base::end);
+    fileLength = shaderFInStrm.tellg();
 
     char* fragmentShaderSrc = new char[fileLength + 1];
 
-    fInStrm.seekg(0);
+    shaderFInStrm.seekg(0);
 
-    fInStrm.read(fragmentShaderSrc, fileLength);
+    shaderFInStrm.read(fragmentShaderSrc, fileLength);
 
     *(fragmentShaderSrc + fileLength) = '\0'; // add a null character, because for whatever reason read() doesn't add one
 
-    fInStrm.close();
+    shaderFInStrm.close();
     // Make and compile the shader
     fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragmentShader, 1, (const char* const*) &fragmentShaderSrc, NULL);

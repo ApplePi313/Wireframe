@@ -1,5 +1,6 @@
 #include "Entity/Entity.hpp"
 
+Entity::Entity() {}
 
 int Entity::getErrorCode() {
     return error;
@@ -25,6 +26,9 @@ void Entity::setCoords(Coord c) {
     coords = c;
 
     hitbox.setCoords(coords);
+}
+Coord Entity::getCoords() {
+    return coords;
 }
 void Entity::translate(Coord c) {
     coords += c;
